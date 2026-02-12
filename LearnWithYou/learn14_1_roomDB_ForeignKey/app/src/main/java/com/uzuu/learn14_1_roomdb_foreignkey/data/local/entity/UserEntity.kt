@@ -19,8 +19,8 @@ import androidx.room.PrimaryKey
     ]
 )
 data class UserEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey()
+    val id: Int,
     val idClass: Int, //khoa ngoai
     val nameStudent: String = ""
 )

@@ -11,27 +11,22 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ClassDao {
-    //create
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(classes: ClassEntity) : Long
+    suspend fun insert(classes: ClassEntity): Long
 
-    //update
     @Update
-    suspend fun update(classes: ClassEntity) : Int
+    suspend fun update(classes: ClassEntity): Int
 
-    //get all
-    @Query("select * from classes order by id desc")
-    suspend fun observeAll() : Flow<List<ClassEntity>>
+    @Query("SELECT * FROM classes ORDER BY id DESC")
+    fun observeAll(): Flow<List<ClassEntity>>
 
-    //get by id
-    @Query("select * from classes where id = :id")
-    suspend fun getClassById(id :Long) : Int
+    @Query("SELECT * FROM classes WHERE id = :id LIMIT 1")
+    suspend fun getClassById(id: Int): ClassEntity?
 
-    //delete all
-    @Query("delete from classes")
-    suspend fun deleteAll() : Int
+    @Query("DELETE FROM classes")
+    suspend fun deleteAll(): Int
 
-    //delete by id
-    @Query("delete from classes where id = :id")
-    suspend fun deleteClassById(id: Long) : Int
+    @Query("DELETE FROM classes WHERE id = :id")
+    suspend fun deleteClassById(id: Int): Int
 }

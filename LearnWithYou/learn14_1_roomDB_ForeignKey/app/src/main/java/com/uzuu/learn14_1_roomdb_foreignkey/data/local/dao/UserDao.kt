@@ -7,31 +7,36 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.uzuu.learn14_1_roomdb_foreignkey.data.local.entity.UserEntity
+import com.uzuu.learn14_1_roomdb_foreignkey.domain.model.UserWithClass
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
-    //create
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(user: UserEntity) : Long
+    suspend fun insert(user: UserEntity): Long
 
-    //update
     @Update
-    suspend fun update(user: UserEntity) : Int
+    suspend fun update(user: UserEntity): Int
 
-    //get all
-    @Query("select * from users order by id desc")
-    suspend fun observeAll() : Flow<List<UserEntity>>
+    @Query("SELECT * FROM users ORDER BY id DESC")
+    fun observeAll(): Flow<List<UserEntity>>
 
-    //get by id
-    @Query("select * from users where id = :id")
-    suspend fun getUserById(id :Long) : Int
+    // JOIN lấy className
+    @Query("""
+        SELECT u.id, u.idClass, u.nameStudent, c.name AS className
+        FROM users u
+        JOIN classes c ON c.id = u.idClass
+        ORDER BY u.id DESC
+    """)
+    fun observeUsersWithClass(): Flow<List<UserWithClass>>
 
-    //delete all
-    @Query("delete from users")
-    suspend fun deleteAll() : Int
+    @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
+    suspend fun getUserById(id: Int): UserEntity?
 
-    //delete by id
-    @Query("delete from users where id = :id")
-    suspend fun deleteUserById(id: Long) : Int
+    @Query("DELETE FROM users")
+    suspend fun deleteAll(): Int
+
+    @Query("DELETE FROM users WHERE id = :id")
+    suspend fun deleteUserById(id: Int): Int
 }
