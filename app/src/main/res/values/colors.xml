@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- ================= PRIMARY BLUE ================= -->
+    <!-- Màu chính của app: toolbar, button, icon active, selected item ,progress bar -->
+    <color name="blue_primary_950">#082567</color>
+    <color name="blue_primary_900">#0D47A1</color>
+    <color name="blue_primary_850">#134B9A</color>
+    <color name="blue_primary_800">#1565C0</color>
+    <color name="blue_primary_750">#1769C5</color>
+    <color name="blue_primary_700">#1976D2</color>
+    <color name="blue_primary_650">#1B7DD9</color>
+    <color name="blue_primary_600">#1E88E5</color>
+    <color name="blue_primary_550">#2090EC</color>
+    <color name="blue_primary_500">#2196F3</color>
+    <color name="blue_primary_450">#2C9CF5</color>
+    <color name="blue_primary_400">#42A5F5</color>
+    <color name="blue_primary_350">#4FAAF7</color>
+    <color name="blue_primary_300">#64B5F6</color>
+    <color name="blue_primary_250">#78BFF8</color>
+    <color name="blue_primary_200">#90CAF9</color>
+    <color name="blue_primary_150">#A5D6FA</color>
+    <color name="blue_primary_100">#BBDEFB</color>
+    <color name="blue_primary_75">#D2E8FD</color>
+    <color name="blue_primary_50">#E3F2FD</color>
+
+    <!-- ================= BACKGROUND BLUE ================= -->
+    <!-- Nền màn hình, section nhẹ, empty state -->
+    <color name="blue_bg_1">#F8FBFF</color>
+    <color name="blue_bg_2">#F3F8FF</color>
+    <color name="blue_bg_3">#EDF4FF</color>
+    <color name="blue_bg_4">#EAF2FF</color>
+    <color name="blue_bg_5">#E6F0FF</color>
+    <color name="blue_bg_6">#E1EDFF</color>
+    <color name="blue_bg_7">#DCEBFF</color>
+    <color name="blue_bg_8">#D7E8FF</color>
+    <color name="blue_bg_9">#D2E5FF</color>
+    <color name="blue_bg_10">#CCE2FF</color>
+
+    <!-- ================= SURFACE / CARD ================= -->
+    <!-- Container như card, dialog, item list, bottom sheet -->
+    <color name="blue_surface_1">#F5FAFF</color>
+    <color name="blue_surface_2">#F0F7FF</color>
+    <color name="blue_surface_3">#EAF4FF</color>
+    <color name="blue_surface_4">#E3EFFF</color>
+    <color name="blue_surface_5">#DCEBFF</color>
+    <color name="blue_surface_6">#D6E6FF</color>
+    <color name="blue_surface_7">#CFE2FF</color>
+    <color name="blue_surface_8">#C8DDFF</color>
+    <color name="blue_surface_9">#C2D8FF</color>
+    <color name="blue_surface_10">#BCD3FF</color>
+
+    <!-- ================= ACCENT BLUE ================= -->
+    <!-- Highlight, selected state, badge -->
+    <color name="blue_accent_900">#0039CB</color>
+    <color name="blue_accent_800">#0041D0</color>
+    <color name="blue_accent_700">#0D47D9</color>
+    <color name="blue_accent_600">#1A55E0</color>
+    <color name="blue_accent_500">#2962FF</color>
+    <color name="blue_accent_400">#2979FF</color>
+    <color name="blue_accent_300">#448AFF</color>
+    <color name="blue_accent_200">#66A3FF</color>
+    <color name="blue_accent_100">#82B1FF</color>
+    <color name="blue_accent_50">#B3D1FF</color>
+
+    <!-- ================= BORDER / DIVIDER ================= -->
+    <!-- Line divider, outline button, card border -->
+    <color name="blue_border_1">#E0EDFF</color>
+    <color name="blue_border_2">#D0E2FF</color>
+    <color name="blue_border_3">#C0D7FF</color>
+    <color name="blue_border_4">#B6D4FF</color>
+    <color name="blue_border_5">#9EC5FF</color>
+    <color name="blue_border_6">#86B6FF</color>
+    <color name="blue_border_7">#6EA8FE</color>
+    <color name="blue_border_8">#5599FF</color>
+
+
+    <!-- ================= TEXT ON BLUE ================= -->
+    <!-- Text trên nền xanh -->
+    <color name="blue_text_dark">#0B3D91</color>
+    <color name="blue_text_primary">#1A56DB</color>
+    <color name="blue_text_secondary">#3B82F6</color>
+    <color name="blue_text_light">#60A5FA</color>
+
+    <color name="event_upcoming">#B851169E</color>
+    <color name="event_on_sale">#C1971D</color>
+    <color name="event_ongoing">#FF0000</color>
+    <color name="event_completed">#12BA12</color>
+</resources>

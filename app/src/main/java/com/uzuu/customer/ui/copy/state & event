@@ -1,0 +1,12 @@
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+    private val _ = MutableStateFlow()
+    val xxx = _xxx.asStateFlow()
+
+    private val _ = MutableSharedFlow<>(extraBufferCapacity = 3)
+    val xxx = _xxx.asSharedFlow()

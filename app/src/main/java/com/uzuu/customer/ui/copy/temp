@@ -1,0 +1,24 @@
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_create"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="+"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/blue_primary_250"
+            android:elevation="8dp"
+            android:translationZ="8dp"
+            app:cornerRadius="16dp"
+            app:strokeColor="@color/blue_primary_350"
+            app:strokeWidth="2dp"/>
+
+
+            ================recyeler ngang
+            val adapter = CategoryAdapter(generateCategories())
+
+                    binding.recyclerCategory.layoutManager =
+                        LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+                    binding.recyclerCategory.adapter = adapter

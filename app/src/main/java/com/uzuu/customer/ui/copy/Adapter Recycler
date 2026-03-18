@@ -1,0 +1,34 @@
+val onClick: (Times) -> Unit
+): ListAdapter<Times, yyyy.VH>(DIFF) {
+
+    class VH(val binding: xxx) : RecyclerView.ViewHolder(binding.root)
+
+    companion object {
+        private val DIFF = object : DiffUtil.ItemCallback<Times>() {
+
+            override fun areItemsTheSame(oldItem: Times, newItem: Times): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: Times, newItem: Times): Boolean {
+                return oldItem == newItem
+            }
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): yyyy.VH {
+        val binding = xxx.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return VH(binding)
+    }
+
+    override fun onBindViewHolder(holder: yyyy.VH, position: Int) {
+        val item = getItem(position)
+           // code getitem here
+
+        holder.binding.root.setOnClickListener { onClick(item) }
+    }
+}

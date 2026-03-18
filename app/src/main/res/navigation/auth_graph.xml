@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/auth_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.uzuu.customer.feature.start.register.RegisterFragment"
+        android:label="Register">
+        <action
+            android:id="@+id/action_register_to_login"
+            app:destination="@id/loginFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/forgetPassFragment"
+        android:name="com.uzuu.customer.feature.start.forgetpass.ForgetFragment"
+        android:label="Forget Password">
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.uzuu.customer.feature.start.login.LoginFragment"
+        android:label="Login">
+        <action
+            android:id="@+id/action_login_to_register"
+            app:destination="@id/registerFragment"/>
+
+        <action
+            android:id="@+id/action_login_to_forget"
+            app:destination="@id/forgetPassFragment"/>
+
+        <action
+            android:id="@+id/action_login_to_home"
+            app:destination="@id/main_graph"/>
+
+        <argument
+            android:name="usernameStr"
+            app:argType="string"
+            android:defaultValue=""/>
+    </fragment>
+
+    <include app:graph="@navigation/main_graph"/>
+</navigation>

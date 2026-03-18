@@ -1,0 +1,10 @@
+
+
+
+
+
+data class Toast(val message: String) : xxx()
+
+object navigateBack : xxx()
+
+data class navigateWith(val id: Int) : xxx()

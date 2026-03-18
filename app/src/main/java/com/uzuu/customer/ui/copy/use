@@ -1,0 +1,26 @@
+fun formatDate(input: String): String {
+    val instant = Instant.parse(input)
+    val zoned = instant.atZone(ZoneId.systemDefault())
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+    return zoned.format(formatter)
+}
+
+
+6. QUAN TRỌNG: Date gửi lên kiểu gì?
+
+Server yêu cầu:
+
+string($date-time)
+
+👉 Nghĩa là:
+👉 BẮT BUỘC format ISO-8601
+
+✅ Format chuẩn:
+2026-03-17T10:50:47.367Z
+Cách convert từ DatePicker + TimePicker
+fun toIsoTime(millis: Long): String {
+    return Instant.ofEpochMilli(millis)
+        .atZone(ZoneId.systemDefault())
+        .toInstant()
+        .toString()
+}
