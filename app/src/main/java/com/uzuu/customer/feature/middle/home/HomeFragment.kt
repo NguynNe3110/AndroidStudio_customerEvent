@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -14,13 +15,16 @@ import androidx.navigation.NavOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.uzuu.customer.R
+import com.uzuu.customer.core.result.ApiResult
 import com.uzuu.customer.data.session.SessionManager
 import com.uzuu.customer.databinding.FragmentHomeBinding
 import com.uzuu.customer.domain.model.Event
 import com.uzuu.customer.feature.MainActivity
 import com.uzuu.customer.ui.adapter.CategoryAdapter
 import com.uzuu.customer.ui.adapter.EventAdapter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class HomeFragment : Fragment() {
 
@@ -33,7 +37,6 @@ class HomeFragment : Fragment() {
     private val viewModel: HomeViewModel by viewModels {
         val eventRepo    = (requireActivity() as MainActivity).container.eventRepo
         val categoryRepo = (requireActivity() as MainActivity).container.categoryRepo
-        println("DEBUG [HomeFragment] creating ViewModel — eventRepo=$eventRepo, categoryRepo=$categoryRepo")
         HomeFactory(eventRepo, categoryRepo)
     }
 
@@ -43,13 +46,12 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        println("DEBUG [HomeFragment] onCreateView")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        println("DEBUG [HomeFragment] onViewCreated")
         setupAdapters()
+        setupSearch()       // ← THÊM
         observeState()
         observeEvent()
         setupPagination()
@@ -57,10 +59,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupAdapters() {
-        println("DEBUG [HomeFragment] setupAdapters()")
-
         categoryAdapter = CategoryAdapter { clickedCategory ->
-            println("DEBUG [HomeFragment] category clicked: id=${clickedCategory.id}, name='${clickedCategory.name}'")
             viewModel.onCategorySelected(clickedCategory)
         }
         binding.recyclerCategory.apply {
@@ -68,10 +67,8 @@ class HomeFragment : Fragment() {
             adapter = categoryAdapter
             setHasFixedSize(true)
         }
-        println("DEBUG [HomeFragment] recyclerCategory set up — id=${binding.recyclerCategory.id}")
 
         eventAdapter = EventAdapter { event ->
-            println("DEBUG [HomeFragment] event clicked: id=${event.id}, name='${event.name}'")
             showBottomSheet(event)
         }
         binding.recyclerEvent.apply {
@@ -79,15 +76,19 @@ class HomeFragment : Fragment() {
             adapter = eventAdapter
             setHasFixedSize(true)
         }
-        println("DEBUG [HomeFragment] recyclerEvent set up — id=${binding.recyclerEvent.id}")
+    }
+
+    // ── THÊM MỚI: lắng nghe EditText tìm kiếm ──────────────────────────────
+    private fun setupSearch() {
+        binding.edtSearch.addTextChangedListener { editable ->
+            viewModel.onSearch(editable?.toString() ?: "")
+        }
     }
 
     private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.homeState.collect { state ->
-                    println("DEBUG [HomeFragment] state collected — categories=${state.categories.size}, events=${state.events.size}, isLoading=${state.isLoading}")
-
                     categoryAdapter.submitList(state.categories)
                     eventAdapter.submitList(state.events)
                 }
@@ -95,7 +96,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun  observeEvent() {
+    private fun observeEvent() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.homeEvent.collect { event ->
@@ -122,6 +123,7 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
     private fun setupPagination() {
         binding.recyclerEvent.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -130,25 +132,33 @@ class HomeFragment : Fragment() {
                 val lastVisible = lm.findLastVisibleItemPosition()
                 val total = lm.itemCount
                 if (lastVisible >= total - 3) {
-                    println("DEBUG [HomeFragment] near bottom — lastVisible=$lastVisible, total=$total → loadMoreEvents()")
                     viewModel.loadMoreEvents()
                 }
             }
         })
     }
 
+    // ── Mở BottomSheet, truyền callback addToCart ───────────────────────────
     private fun showBottomSheet(event: Event) {
-        if (parentFragmentManager.findFragmentByTag("event_bottom_sheet") != null) {
-            println("DEBUG [HomeFragment] bottomSheet already showing, skip")
-            return
-        }
-        println("DEBUG [HomeFragment] showing BottomSheet for event: id=${event.id}")
-        HomeBottomSheet(event).show(parentFragmentManager, "event_bottom_sheet")
+        if (parentFragmentManager.findFragmentByTag("event_bottom_sheet") != null) return
+
+        HomeBottomSheet(
+            event = event,
+            onAddToCart = { ticketTypeId, qty ->
+                // Chạy trên IO, gọi cartRepo trực tiếp
+                val cartRepo = (requireActivity() as MainActivity).container.cartRepo
+                val result = cartRepo.addToCart(ticketTypeId, qty)
+                if (result is ApiResult.Error) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        ).show(parentFragmentManager, "event_bottom_sheet")
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        println("DEBUG [HomeFragment] onDestroyView")
         _binding = null
     }
 }

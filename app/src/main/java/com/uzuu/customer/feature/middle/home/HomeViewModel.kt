@@ -3,6 +3,7 @@ package com.uzuu.customer.feature.middle.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.uzuu.customer.domain.model.CategoryItem
+import com.uzuu.customer.domain.model.Event
 import com.uzuu.customer.domain.repository.CategoryRepository
 import com.uzuu.customer.domain.repository.EventRepository
 import kotlinx.coroutines.async
@@ -41,7 +42,7 @@ class HomeViewModel(
                         _homeEvent.emit(HomeUiEvent.Toast("Phiên đăng nhập hết hạn"))
                         _homeEvent.emit(HomeUiEvent.navigateBack)
                     }
-                    emptyList<CategoryItem>()  // ← return đúng type
+                    emptyList<CategoryItem>()
                 }
             }
 
@@ -57,7 +58,7 @@ class HomeViewModel(
                         _homeEvent.emit(HomeUiEvent.Toast("Phiên đăng nhập hết hạn"))
                         _homeEvent.emit(HomeUiEvent.navigateBack)
                     }
-                    null  // ← return null, bên dưới đã xử lý ?: emptyList()
+                    null
                 }
             }
 
@@ -81,29 +82,29 @@ class HomeViewModel(
 
     fun loadMoreEvents() {
         val state = _homeState.value
-        println("DEBUG [HomeViewModel] loadMoreEvents() — isLoading=${state.isLoading}, isLastPage=${state.isLastPage}, page=$currentPage")
-
         if (state.isLoading || state.isLastPage) return
 
         viewModelScope.launch {
             _homeState.update { it.copy(isLoading = true) }
             try {
                 val result = eventRepo.getEvent(currentPage)
-                println("DEBUG [HomeViewModel] loadMore page=$currentPage OK: ${result.data.size} items")
                 currentPage++
                 _homeState.update { s ->
                     val newAll = s.allEvents + result.data
-                    val filtered = filterByCategory(newAll, s.selectedCategoryId, s.categories)
-                    s.copy(allEvents = newAll, events = filtered, isLoading = false, isLastPage = result.isLast)
+                    val filtered = filterByCategoryAndQuery(newAll, s.selectedCategoryId, s.categories, s.searchQuery)
+                    s.copy(
+                        allEvents = newAll,
+                        events = filtered,
+                        isLoading = false,
+                        isLastPage = result.isLast
+                    )
                 }
             } catch (e: Exception) {
                 val msg = e.message ?: ""
-                println("DEBUG [HomeViewModel] ERROR: $msg")
-
+                println("DEBUG [HomeViewModel] loadMore ERROR: $msg")
                 if (msg.contains("401")) {
-                    println("DEBUG [HomeViewModel] Token expired → redirect to login")
                     _homeEvent.emit(HomeUiEvent.Toast("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại"))
-                    _homeEvent.emit(HomeUiEvent.navigateBack)  // về Login
+                    _homeEvent.emit(HomeUiEvent.navigateBack)
                 }
                 _homeState.update { it.copy(isLoading = false) }
             }
@@ -111,24 +112,54 @@ class HomeViewModel(
     }
 
     fun onCategorySelected(category: CategoryItem) {
-        println("DEBUG [HomeViewModel] onCategorySelected: id=${category.id}, name='${category.name}'")
         _homeState.update { state ->
             val updatedCategories = state.categories.map { it.copy(isSelected = it.id == category.id) }
-            val filtered = filterByCategory(state.allEvents, category.id, updatedCategories)
-            println("DEBUG [HomeViewModel] filtered: ${filtered.size} events")
-            state.copy(categories = updatedCategories, selectedCategoryId = category.id, events = filtered)
+            val filtered = filterByCategoryAndQuery(state.allEvents, category.id, updatedCategories, state.searchQuery)
+            state.copy(
+                categories = updatedCategories,
+                selectedCategoryId = category.id,
+                events = filtered
+            )
         }
     }
 
-    private fun filterByCategory(
-        events: List<com.uzuu.customer.domain.model.Event>,
-        selectedId: Int,
-        categories: List<CategoryItem>
-    ): List<com.uzuu.customer.domain.model.Event> {
-        if (selectedId == -1) return events
-        val selectedName = categories.find { it.id == selectedId }?.name
-        println("DEBUG [HomeViewModel] filterByCategory: id=$selectedId, name='$selectedName'")
-        if (selectedName == null) return events
-        return events.filter { it.categoryName == selectedName }
+    // ── THÊM MỚI: tìm kiếm theo tên ─────────────────────────────────────────
+    fun onSearch(query: String) {
+        _homeState.update { state ->
+            val filtered = filterByCategoryAndQuery(
+                events     = state.allEvents,
+                categoryId = state.selectedCategoryId,
+                categories = state.categories,
+                query      = query
+            )
+            state.copy(searchQuery = query, events = filtered)
+        }
+    }
+
+    // ── Helper: lọc kết hợp category + từ khóa ──────────────────────────────
+    private fun filterByCategoryAndQuery(
+        events: List<Event>,
+        categoryId: Int,
+        categories: List<CategoryItem>,
+        query: String
+    ): List<Event> {
+        var result = events
+
+        // Lọc theo category
+        if (categoryId != -1) {
+            val selectedName = categories.find { it.id == categoryId }?.name
+            if (selectedName != null) {
+                result = result.filter { it.categoryName == selectedName }
+            }
+        }
+
+        // Lọc theo tên sự kiện (case-insensitive)
+        if (query.isNotBlank()) {
+            result = result.filter {
+                it.name.contains(query.trim(), ignoreCase = true)
+            }
+        }
+
+        return result
     }
 }

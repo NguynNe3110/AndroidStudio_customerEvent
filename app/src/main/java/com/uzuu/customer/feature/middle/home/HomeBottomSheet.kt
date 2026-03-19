@@ -5,14 +5,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.uzuu.customer.databinding.BottomsheetEventBinding
 import com.uzuu.customer.domain.model.Event
 import com.uzuu.customer.ui.adapter.CategoryTicketAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class HomeBottomSheet(
-    private val event: Event
+    private val event: Event,
+    // Callback suspend: fragment gọi cartRepo.addToCart bên ngoài
+    private val onAddToCart: suspend (ticketTypeId: Long, quantity: Int) -> Unit
 ) : BottomSheetDialogFragment() {
 
     private var _binding: BottomsheetEventBinding? = null
@@ -36,10 +41,10 @@ class HomeBottomSheet(
     }
 
     private fun bindEventInfo() {
-        binding.txtNameEvent.text = event.name
-        binding.txtAddress.text = "📍 ${event.location}"
-        binding.txtDateTimeStart.text = "Bắt đầu: ${event.startTime ?: "Chưa xác định"}"
-        binding.txtDateTimeEnd.text = "Kết thúc: ${event.endTime ?: "Chưa xác định"}"
+        binding.txtNameEvent.text       = event.name
+        binding.txtAddress.text         = "📍 ${event.location}"
+        binding.txtDateTimeStart.text   = "Bắt đầu: ${event.startTime ?: "Chưa xác định"}"
+        binding.txtDateTimeEnd.text     = "Kết thúc: ${event.endTime ?: "Chưa xác định"}"
     }
 
     private fun setupTicketRecycler() {
@@ -48,42 +53,75 @@ class HomeBottomSheet(
             adapter = ticketAdapter
             setHasFixedSize(false)
         }
-        // Submit danh sách loại vé của sự kiện này
         ticketAdapter.submitList(event.ticketTypes)
     }
 
     private fun setupButtons() {
         binding.txtViewDetail.setOnClickListener {
-            // TODO: Navigate to event detail screen
             Toast.makeText(context, "Xem chi tiết: ${event.name}", Toast.LENGTH_SHORT).show()
         }
 
-        binding.handleBar.setOnClickListener {
-            dismiss()
-        }
+        binding.handleBar.setOnClickListener { dismiss() }
 
+        // ── Thêm vào giỏ ────────────────────────────────────────────────────
         binding.btnAddToCart.setOnClickListener {
             val selected = ticketAdapter.getSelectedQuantities()
             if (selected.isEmpty()) {
                 Toast.makeText(context, "Vui lòng chọn ít nhất 1 vé", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            // TODO: Gọi API POST /cart/add cho từng loại vé
-            val summary = selected.entries.joinToString("\n") { (id, qty) ->
-                val ticket = event.ticketTypes.find { it.id == id }
-                "${ticket?.name ?: id}: $qty vé"
+
+            // Disable button tránh bấm 2 lần
+            binding.btnAddToCart.isEnabled = false
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                var hasError = false
+                selected.forEach { (ticketTypeId, qty) ->
+                    try {
+                        onAddToCart(ticketTypeId, qty)
+                    } catch (e: Exception) {
+                        hasError = true
+                    }
+                }
+
+                launch(Dispatchers.Main) {
+                    binding.btnAddToCart.isEnabled = true
+                    if (hasError) {
+                        Toast.makeText(context, "Có lỗi khi thêm vé, thử lại", Toast.LENGTH_SHORT).show()
+                    } else {
+                        val summary = selected.entries.joinToString(", ") { (id, qty) ->
+                            val ticket = event.ticketTypes.find { it.id == id }
+                            "${ticket?.name ?: id} ×$qty"
+                        }
+                        Toast.makeText(context, "✓ Đã thêm: $summary", Toast.LENGTH_SHORT).show()
+                        ticketAdapter.resetQuantities()
+                        dismiss()
+                    }
+                }
             }
-            Toast.makeText(context, "Thêm vào giỏ:\n$summary", Toast.LENGTH_LONG).show()
         }
 
+        // ── Mua ngay: thêm vào giỏ → fragment sẽ điều hướng tới Cart ────────
         binding.btnBuyNow.setOnClickListener {
             val selected = ticketAdapter.getSelectedQuantities()
             if (selected.isEmpty()) {
                 Toast.makeText(context, "Vui lòng chọn ít nhất 1 vé", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            // TODO: Gọi API POST /cart/add rồi POST /orders/checkout
-            Toast.makeText(context, "Tính năng mua ngay đang phát triển", Toast.LENGTH_SHORT).show()
+
+            binding.btnBuyNow.isEnabled = false
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                selected.forEach { (ticketTypeId, qty) ->
+                    onAddToCart(ticketTypeId, qty)
+                }
+                launch(Dispatchers.Main) {
+                    binding.btnBuyNow.isEnabled = true
+                    Toast.makeText(context, "Đã thêm vào giỏ – chuyển đến trang thanh toán", Toast.LENGTH_SHORT).show()
+                    dismiss()
+                    // TODO: navigate tới CartFragment nếu muốn tự động chuyển tab
+                }
+            }
         }
     }
 
