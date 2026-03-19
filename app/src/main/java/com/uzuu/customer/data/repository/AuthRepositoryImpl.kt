@@ -18,7 +18,7 @@ class AuthRepositoryImpl(
         safeApiCall {
             val response = remote.register(request.registerDomainToDto())
             // Kiểm tra code thực tế server trả về (200, 201, 0, 1000...)
-            if (response.code == 200 || response.code == 0) {
+            if (response.code == 200 || response.code == 0 || response.code == 1000) {
                 response.result ?: "Đăng ký thành công"
             } else {
                 throw Exception(response.message ?: "Đăng ký thất bại")

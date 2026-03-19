@@ -2,20 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_graph"
-    app:startDestination="@id/splashFragment">
-
-    <fragment
-        android:id="@+id/splashFragment"
-        android:name="com.uzuu.customer.feature.first.SplashFragment"
-        android:label="Plash">
-        <action
-            android:id="@+id/action_splash_to_login"
-            app:destination="@id/auth_graph"/>
-
-        <action
-            android:id="@+id/action_splash_to_home"
-            app:destination="@id/mainFragment"/>
-    </fragment>
+    app:startDestination="@id/auth_graph">
 
     <include app:graph="@navigation/auth_graph"/>
 

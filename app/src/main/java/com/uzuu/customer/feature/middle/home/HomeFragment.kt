@@ -4,13 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.uzuu.customer.R
+import com.uzuu.customer.data.session.SessionManager
 import com.uzuu.customer.databinding.FragmentHomeBinding
 import com.uzuu.customer.domain.model.Event
 import com.uzuu.customer.feature.MainActivity
@@ -47,6 +51,7 @@ class HomeFragment : Fragment() {
         println("DEBUG [HomeFragment] onViewCreated")
         setupAdapters()
         observeState()
+        observeEvent()
         setupPagination()
         viewModel.init()
     }
@@ -90,6 +95,33 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun  observeEvent() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.homeEvent.collect { event ->
+                    when (event) {
+                        is HomeUiEvent.Toast -> {
+                            Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                        }
+                        is HomeUiEvent.navigateBack -> {
+                            SessionManager.clear()
+                            val rootNavController = (requireActivity() as MainActivity)
+                                .supportFragmentManager
+                                .findFragmentById(R.id.root_nav_host)
+                                .let { it as androidx.navigation.fragment.NavHostFragment }
+                                .navController
+                            rootNavController.navigate(
+                                R.id.auth_graph,
+                                null,
+                                NavOptions.Builder().setPopUpTo(R.id.root_graph, true).build()
+                            )
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
+    }
     private fun setupPagination() {
         binding.recyclerEvent.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

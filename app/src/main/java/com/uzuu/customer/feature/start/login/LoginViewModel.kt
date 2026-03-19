@@ -59,16 +59,19 @@ class LoginViewModel(
             when(val r = authRepo.loginRequest(login)) {
 
                 is ApiResult.Success -> {
+                    println("DEBUG [LoginVM] response = ${r.data}")
+                    println("DEBUG [LoginVM] new token = ${r.data.result.token}")
 
                     val token = r.data.result.token
                     SessionManager.saveToken(token)
-                    println("DEBUG: token is : $token")
+                    println("DEBUG [LoginVM] saved token = ${SessionManager.getToken()}")
                     _loginState.update { it.copy(isLoading = false) }
                     _loginEvent.tryEmit(LoginUiEvent.Toast("Đăng nhập thành công"))
                     _loginEvent.tryEmit(LoginUiEvent.navigateHome)
                 }
 
                 is ApiResult.Error -> {
+                    println("DEBUG [LoginVM] login FAILED: ${r.message}")
                     _loginState.update { it.copy(isLoading = false) }
                     _loginEvent.tryEmit(LoginUiEvent.Toast(r.message))
                 }

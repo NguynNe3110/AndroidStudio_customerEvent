@@ -80,27 +80,21 @@ class EventAdapter(
         when (holder) {
 
             is StartVH -> {
-//                val sumTicket = item.ticketTypes[0].quantity + item.ticketTypes[1].quantity
                 holder.binding.txtNameEventStart.text = item.name
                 holder.binding.txtAddressStart.text = item.location
-                holder.binding.txtPriceStart.text = item.ticketTypes[0].price.toString()
+                val minPrice = item.ticketTypes.minOfOrNull { it.price }
+                holder.binding.txtPriceStart.text = if (minPrice != null) "${minPrice.toLong()}đ" else "Liên hệ"
                 holder.binding.txtStatusStart.text = item.status
-
-//                holder.binding.txtTicketQuantityStart.text = item.
-                holder.binding.root.setOnClickListener {
-                    onClick(item)
-                }
+                holder.binding.root.setOnClickListener { onClick(item) }
             }
 
             is EndVH -> {
                 holder.binding.txtNameEventEnd.text = item.name
                 holder.binding.txtAddressEnd.text = item.location
-                holder.binding.txtPriceEnd.text = item.ticketTypes[0].price.toString()
+                val minPrice = item.ticketTypes.minOfOrNull { it.price }
+                holder.binding.txtPriceEnd.text = if (minPrice != null) "${minPrice.toLong()}đ" else "Liên hệ"
                 holder.binding.txtStatusEnd.text = item.status
-
-                holder.binding.root.setOnClickListener {
-                    onClick(item)
-                }
+                holder.binding.root.setOnClickListener { onClick(item) }
             }
         }
     }

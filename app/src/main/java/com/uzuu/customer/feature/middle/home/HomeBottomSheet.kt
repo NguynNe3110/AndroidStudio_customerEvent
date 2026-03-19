@@ -38,8 +38,8 @@ class HomeBottomSheet(
     private fun bindEventInfo() {
         binding.txtNameEvent.text = event.name
         binding.txtAddress.text = "📍 ${event.location}"
-        binding.txtDateTimeStart.text = "Bắt đầu: ${event.startTime}"
-        binding.txtDateTimeEnd.text = "Kết thúc: ${event.endTime}"
+        binding.txtDateTimeStart.text = "Bắt đầu: ${event.startTime ?: "Chưa xác định"}"
+        binding.txtDateTimeEnd.text = "Kết thúc: ${event.endTime ?: "Chưa xác định"}"
     }
 
     private fun setupTicketRecycler() {

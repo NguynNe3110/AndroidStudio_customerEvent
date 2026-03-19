@@ -18,7 +18,7 @@ class HomeViewModel(
     private val categoryRepo: CategoryRepository
 ) : ViewModel() {
 
-    private var currentPage = 0
+    private var currentPage = 1
     private val _homeState = MutableStateFlow(HomeUiState())
     val homeState = _homeState.asStateFlow()
 
@@ -26,43 +26,44 @@ class HomeViewModel(
     val homeEvent = _homeEvent.asSharedFlow()
 
     fun init() {
-        println("DEBUG [HomeViewModel] init() called — currentPage=$currentPage")
-
         viewModelScope.launch {
             _homeState.update { it.copy(isLoading = true) }
 
-            // Load categories và events song song
             val categoriesDeferred = async {
                 try {
-                    println("DEBUG [HomeViewModel] loading categories...")
                     val result = categoryRepo.getAllCategories()
-                    println("DEBUG [HomeViewModel] categories OK: ${result.size} items → $result")
+                    println("DEBUG [HomeViewModel] categories OK: ${result.size}")
                     result
                 } catch (e: Exception) {
-                    println("DEBUG [HomeViewModel] ERROR categories: ${e::class.simpleName} — ${e.message}")
-                    e.printStackTrace()
-                    emptyList()
+                    val msg = e.message ?: ""
+                    println("DEBUG [HomeViewModel] ERROR categories: $msg")
+                    if (msg.contains("401")) {
+                        _homeEvent.emit(HomeUiEvent.Toast("Phiên đăng nhập hết hạn"))
+                        _homeEvent.emit(HomeUiEvent.navigateBack)
+                    }
+                    emptyList<CategoryItem>()  // ← return đúng type
                 }
             }
 
             val eventsDeferred = async {
                 try {
-                    println("DEBUG [HomeViewModel] loading events page 0...")
-                    val result = eventRepo.getEvent(0)
-                    println("DEBUG [HomeViewModel] events OK: ${result.data.size} items, isLast=${result.isLast}, totalPages=${result.totalPages}")
+                    val result = eventRepo.getEvent(1)
+                    println("DEBUG [HomeViewModel] events OK: ${result.data.size}")
                     result
                 } catch (e: Exception) {
-                    println("DEBUG [HomeViewModel] ERROR events: ${e::class.simpleName} — ${e.message}")
-                    e.printStackTrace()
-                    null
+                    val msg = e.message ?: ""
+                    println("DEBUG [HomeViewModel] ERROR events: $msg")
+                    if (msg.contains("401")) {
+                        _homeEvent.emit(HomeUiEvent.Toast("Phiên đăng nhập hết hạn"))
+                        _homeEvent.emit(HomeUiEvent.navigateBack)
+                    }
+                    null  // ← return null, bên dưới đã xử lý ?: emptyList()
                 }
             }
 
             val categories = categoriesDeferred.await()
             val eventsResult = eventsDeferred.await()
             val events = eventsResult?.data ?: emptyList()
-
-            println("DEBUG [HomeViewModel] init() done — categories=${categories.size}, events=${events.size}")
 
             _homeState.update { state ->
                 state.copy(
@@ -74,8 +75,7 @@ class HomeViewModel(
                 )
             }
 
-            currentPage = 1
-            println("DEBUG [HomeViewModel] state after init — isLastPage=${_homeState.value.isLastPage}, currentPage=$currentPage")
+            currentPage = 2
         }
     }
 
@@ -97,8 +97,14 @@ class HomeViewModel(
                     s.copy(allEvents = newAll, events = filtered, isLoading = false, isLastPage = result.isLast)
                 }
             } catch (e: Exception) {
-                println("DEBUG [HomeViewModel] ERROR loadMore: ${e::class.simpleName} — ${e.message}")
-                e.printStackTrace()
+                val msg = e.message ?: ""
+                println("DEBUG [HomeViewModel] ERROR: $msg")
+
+                if (msg.contains("401")) {
+                    println("DEBUG [HomeViewModel] Token expired → redirect to login")
+                    _homeEvent.emit(HomeUiEvent.Toast("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại"))
+                    _homeEvent.emit(HomeUiEvent.navigateBack)  // về Login
+                }
                 _homeState.update { it.copy(isLoading = false) }
             }
         }

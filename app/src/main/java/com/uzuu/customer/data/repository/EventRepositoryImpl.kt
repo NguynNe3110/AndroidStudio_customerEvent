@@ -16,11 +16,6 @@ class EventRepositoryImpl(
         val response = eventRemote.getEvent(page)
         println("DEBUG [EventRepositoryImpl] raw response — code=${response.code}, message='${response.message}'")
 
-        // Kiểm tra server trả code thành công
-        if (response.code != 200 && response.code != 0) {
-            println("DEBUG [EventRepositoryImpl] server returned error code ${response.code}: ${response.message}")
-            throw Exception("Server error ${response.code}: ${response.message}")
-        }
 
         val pageData = response.result
         println("DEBUG [EventRepositoryImpl] result — content=${pageData.content.size}, totalPages=${pageData.totalPages}, totalElements=${pageData.totalElements}, isLast=${pageData.last}, currentPage=${pageData.number}")

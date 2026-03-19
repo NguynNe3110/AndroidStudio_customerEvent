@@ -9,7 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitProvider {
-    private const val BASE_URL = "http://192.168.1.6:8080/event-mng/"
+    private const val BASE_URL = "http://192.168.1.3:8080/event-mng/"
 
     //okhttp
 
