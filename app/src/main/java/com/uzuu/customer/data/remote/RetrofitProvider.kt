@@ -4,13 +4,14 @@ import com.uzuu.customer.data.remote.api.AuthApi
 import com.uzuu.customer.data.remote.api.CartApi
 import com.uzuu.customer.data.remote.api.CategoryApi
 import com.uzuu.customer.data.remote.api.EventApi
+import com.uzuu.customer.data.remote.api.UserApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitProvider {
-    private const val BASE_URL = "http://192.168.1.3:8080/event-mng/"
+    private const val BASE_URL = "http://192.168.1.9:8080/event-mng/"
 
     //okhttp
 
@@ -45,4 +46,5 @@ object RetrofitProvider {
         retrofit.create(CategoryApi::class.java) }
 
     val cartApi: CartApi by lazy { retrofit.create(CartApi::class.java) }
+    val userApi: UserApi by lazy { retrofit.create(UserApi::class.java) }
 }

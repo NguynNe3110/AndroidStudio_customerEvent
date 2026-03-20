@@ -8,6 +8,7 @@ import com.uzuu.customer.data.remote.datasource.AuthRemoteDataSource
 import com.uzuu.customer.data.remote.datasource.CartRemoteDataSource
 import com.uzuu.customer.data.remote.datasource.CategoryRemoteDataSource
 import com.uzuu.customer.data.remote.datasource.EventRemoteDataSource
+import com.uzuu.customer.data.remote.datasource.UserRemoteDataSource
 import com.uzuu.customer.data.repository.AuthRepositoryImpl
 import com.uzuu.customer.data.repository.CartRepositoryImpl
 import com.uzuu.customer.data.repository.CategoryRepositoryImpl
@@ -17,25 +18,27 @@ import com.uzuu.customer.data.repository.UserRepositoryImpl
 class AppContainer(context: Context) {
     private val db = AppDatabase.get(context)
 
-    // ── APIs ─────────────────────────────────────────────────────────────────
+    // ── APIs ──────────────────────────────────────────────────────────────────
     val authApi     = RetrofitProvider.authApi
     val eventApi    = RetrofitProvider.eventApi
     val categoryApi = RetrofitProvider.categoryApi
-    val cartApi     = RetrofitProvider.cartApi          // ← THÊM
+    val cartApi     = RetrofitProvider.cartApi
+    val userApi     = RetrofitProvider.userApi
 
     // ── Local ─────────────────────────────────────────────────────────────────
     val userLocal = UserDataLocalSource(db.userDao())
 
     // ── Remote data sources ───────────────────────────────────────────────────
-    val authRemote     = AuthRemoteDataSource(authApi     = authApi)
-    val eventRemote    = EventRemoteDataSource(eventApi   = eventApi)
+    val authRemote     = AuthRemoteDataSource(authApi = authApi)
+    val eventRemote    = EventRemoteDataSource(eventApi = eventApi)
     val categoryRemote = CategoryRemoteDataSource(categoryApi = categoryApi)
-    val cartRemote     = CartRemoteDataSource(cartApi     = cartApi) // ← THÊM
+    val cartRemote     = CartRemoteDataSource(cartApi = cartApi)
+    val userRemote     = UserRemoteDataSource(userApi = userApi)
 
     // ── Repositories ──────────────────────────────────────────────────────────
-    val userRepo     = UserRepositoryImpl(userLocal)
+    val userRepo     = UserRepositoryImpl(userLocal, userRemote)
     val authRepo     = AuthRepositoryImpl(authRemote)
     val eventRepo    = EventRepositoryImpl(eventRemote)
     val categoryRepo = CategoryRepositoryImpl(categoryRemote)
-    val cartRepo     = CartRepositoryImpl(cartRemote)  // ← THÊM
+    val cartRepo     = CartRepositoryImpl(cartRemote)
 }

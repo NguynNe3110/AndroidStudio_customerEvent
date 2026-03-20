@@ -3,99 +3,136 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/blue_bg_2"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- ── Header card: avatar + tên ─────────────────────────────────────── -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:shapeAppearanceOverlay="@style/CardRoundedTop"
-        app:contentPadding="12dp"
+        app:contentPadding="16dp"
         android:backgroundTint="@color/blue_surface_9"
         app:cardElevation="4dp">
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="1">
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/imgAvatar"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/avatar"
-                app:strokeColor="@color/blue_border_8"
-                android:padding="2dp"
-                app:strokeWidth="2dp"
-                app:shapeAppearanceOverlay="@style/CircleImage"/>
+            android:gravity="center_vertical">
+
+            <!-- Avatar + camera badge -->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imgAvatar"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/avatar"
+                    app:strokeColor="@color/blue_border_8"
+                    android:padding="2dp"
+                    app:strokeWidth="2dp"
+                    app:shapeAppearanceOverlay="@style/CircleImage"/>
+
+                <!-- Camera badge góc phải dưới -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="bottom|end"
+                    android:src="@drawable/ic_personal"
+                    android:padding="3dp"
+                    android:backgroundTint="@color/blue_primary_550"
+                    android:background="@drawable/bg_border_blue_circle"
+                    app:shapeAppearanceOverlay="@style/CircleImage"/>
+            </FrameLayout>
 
             <LinearLayout
-                android:layout_width="299dp"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="8dp"
+                android:layout_width="0dp"
                 android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/txt_displayName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Xin chào: Trần Trung Nguyên"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:text="Xin chào: ..."
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/blue_text_dark"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Have a good day!"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:layout_marginTop="4dp"
+                    android:text="Have a good day! ☀️"
+                    android:textSize="13sp"
+                    android:textColor="@color/blue_text_secondary"/>
             </LinearLayout>
+
+            <!-- Loading khi fetch my-info -->
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:visibility="gone"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-
+    <!-- ── Menu list ─────────────────────────────────────────────────────── -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="12dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp"
         android:orientation="vertical">
-
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="12dp"
             app:strokeWidth="1dp"
-            app:strokeColor="#E0E0E0">
+            app:strokeColor="@color/blue_border_2">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- row 1 -->
+                <!-- Row 1: Chỉnh sửa thông tin (có action) -->
                 <LinearLayout
+                    android:id="@+id/row_edit_info"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp">
+                    android:paddingHorizontal="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="onClick1"/>
+                        android:text="✏️  Chỉnh sửa thông tin"
+                        android:textSize="15sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textSize="22sp"
+                        android:textColor="@color/blue_text_secondary"/>
                 </LinearLayout>
 
-                <!-- divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#EEEEEE"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/blue_border_1"/>
 
-                <!-- row 2 -->
+                <!-- Row 2: Giao diện (placeholder) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
@@ -105,18 +142,26 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="onClick2"/>
+                        android:layout_height="wrap_content"
+                        android:text="🎨  Giao diện"
+                        android:textSize="15sp"
+                        android:textColor="@color/blue_text_secondary"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sắp ra mắt"
+                        android:textSize="12sp"
+                        android:textColor="@color/blue_primary_400"
+                        android:background="@drawable/bg_border_blue_square"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"/>
                 </LinearLayout>
 
-                <!-- divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#EEEEEE"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/blue_border_1"/>
 
-                <!-- row 2 -->
+                <!-- Row 3: Thông báo (placeholder) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
@@ -126,18 +171,26 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="onClick2"/>
+                        android:layout_height="wrap_content"
+                        android:text="🔔  Thông báo"
+                        android:textSize="15sp"
+                        android:textColor="@color/blue_text_secondary"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sắp ra mắt"
+                        android:textSize="12sp"
+                        android:textColor="@color/blue_primary_400"
+                        android:background="@drawable/bg_border_blue_square"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"/>
                 </LinearLayout>
 
-                <!-- divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#EEEEEE"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/blue_border_1"/>
 
-                <!-- row 2 -->
+                <!-- Row 4: Đổi mật khẩu (placeholder) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
@@ -147,18 +200,26 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="onClick2"/>
+                        android:layout_height="wrap_content"
+                        android:text="🔒  Đổi mật khẩu"
+                        android:textSize="15sp"
+                        android:textColor="@color/blue_text_secondary"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sắp ra mắt"
+                        android:textSize="12sp"
+                        android:textColor="@color/blue_primary_400"
+                        android:background="@drawable/bg_border_blue_square"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"/>
                 </LinearLayout>
 
-                <!-- divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#EEEEEE"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/blue_border_1"/>
 
-                <!-- row 2 -->
+                <!-- Row 5: Trợ giúp (placeholder) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
@@ -168,18 +229,16 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="onClick2"/>
+                        android:layout_height="wrap_content"
+                        android:text="❓  Trợ giúp"
+                        android:textSize="15sp"
+                        android:textColor="@color/blue_text_secondary"/>
                 </LinearLayout>
 
-                <!-- divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#EEEEEE"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/blue_border_1"/>
 
-                <!-- row 2 -->
+                <!-- Row 6: Về ứng dụng (placeholder) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
@@ -189,25 +248,28 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="onClick2"/>
+                        android:layout_height="wrap_content"
+                        android:text="ℹ️  Về ứng dụng"
+                        android:textSize="15sp"
+                        android:textColor="@color/blue_text_secondary"/>
                 </LinearLayout>
 
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Logout button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_logout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
+            android:layout_marginTop="20dp"
             android:text="Đăng xuất"
             android:textAllCaps="false"
             android:textColor="@color/blue_primary_550"
             app:strokeColor="@color/blue_primary_550"
             app:strokeWidth="1dp"
-            app:cornerRadius="8dp"
+            app:cornerRadius="12dp"
             android:textSize="16sp"
             style="@style/Widget.Material3.Button.OutlinedButton"/>
 

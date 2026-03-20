@@ -18,15 +18,13 @@ import kotlinx.coroutines.launch
 class LoginViewModel(
     private val authRepo: AuthRepository,
     private val userRepo: UserRepository
-
-): ViewModel() {
+) : ViewModel() {
 
     private val _loginState = MutableStateFlow(LoginUiState())
     val loginState = _loginState.asStateFlow()
 
     private val _loginEvent = MutableSharedFlow<LoginUiEvent>(extraBufferCapacity = 3)
     val loginEvent = _loginEvent.asSharedFlow()
-
 
     fun onClickForgetPass(user: String) {
         _loginEvent.tryEmit(LoginUiEvent.navigateForget(user))
@@ -40,36 +38,30 @@ class LoginViewModel(
         _loginState.update { it.copy(username = username) }
     }
 
-    fun onClickLogin(
-        user: String,
-        pass: String
-    ){
+    fun onClickLogin(user: String, pass: String) {
         viewModelScope.launch {
             _loginState.update { it.copy(isLoading = true) }
             delay(400)
 
             if (user.isBlank() || pass.isBlank()) {
-                _loginState.update { it.copy(isLoading = false) } // ← thêm dòng này
+                _loginState.update { it.copy(isLoading = false) }
                 _loginEvent.tryEmit(LoginUiEvent.Toast("Thông tin không được để trống"))
                 return@launch
             }
 
             val login = Login(user, pass)
 
-            when(val r = authRepo.loginRequest(login)) {
-
+            when (val r = authRepo.loginRequest(login)) {
                 is ApiResult.Success -> {
-                    println("DEBUG [LoginVM] response = ${r.data}")
-                    println("DEBUG [LoginVM] new token = ${r.data.result.token}")
-
                     val token = r.data.result.token
                     SessionManager.saveToken(token)
-                    println("DEBUG [LoginVM] saved token = ${SessionManager.getToken()}")
+                    SessionManager.saveUsername(user)   // ← lưu username
+                    println("DEBUG [LoginVM] saved token + username=$user")
+
                     _loginState.update { it.copy(isLoading = false) }
                     _loginEvent.tryEmit(LoginUiEvent.Toast("Đăng nhập thành công"))
                     _loginEvent.tryEmit(LoginUiEvent.navigateHome)
                 }
-
                 is ApiResult.Error -> {
                     println("DEBUG [LoginVM] login FAILED: ${r.message}")
                     _loginState.update { it.copy(isLoading = false) }
@@ -77,6 +69,5 @@ class LoginViewModel(
                 }
             }
         }
-
     }
 }

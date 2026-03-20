@@ -10,16 +10,17 @@ import retrofit2.http.Path
 
 interface UserApi {
 
-    @GET("/users/{username}")
+    @GET("users/my-info")
+    suspend fun getMyInfo(): BaseResponseDto<UserResponseDto>
+
+    @GET("users/{username}")
     suspend fun getInfoByUsername(
         @Path("username") username: String
     ): BaseResponseDto<UserResponseDto>
 
-    @PUT("/users/{username}")
+    @PUT("users/{username}")
     suspend fun updateInfo(
         @Path("username") username: String,
         @Body request: UserRequestDto
-    ):  BaseResponseDto<UserResponseDto>
-
-    // có api get thong tin tai khoan hien tai
+    ): BaseResponseDto<UserResponseDto>
 }

@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_graph"
     app:startDestination="@id/homeFragment">
+
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.uzuu.customer.feature.middle.home.HomeFragment"
         android:label="Home">
-
         <argument
             android:name="usernameStr"
             app:argType="string"
@@ -27,5 +27,17 @@
     <fragment
         android:id="@+id/personalFragment"
         android:name="com.uzuu.customer.feature.middle.personal.PersonalFragment"
-        android:label="Personal"/>
+        android:label="Personal">
+
+        <!-- Action sang màn edit thông tin -->
+        <action
+            android:id="@+id/action_personal_to_editInfo"
+            app:destination="@id/personalInfoFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/personalInfoFragment"
+        android:name="com.uzuu.customer.feature.middle.personal.PersonalInfoFragment"
+        android:label="Chỉnh sửa thông tin"/>
+
 </navigation>

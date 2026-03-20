@@ -1,5 +1,6 @@
 package com.uzuu.customer.feature.middle.home
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -51,11 +52,22 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupAdapters()
-        setupSearch()       // ← THÊM
+        setupSearch()
         observeState()
         observeEvent()
         setupPagination()
         viewModel.init()
+    }
+
+    // Sync avatar mỗi khi quay lại tab Home (user có thể vừa đổi ảnh ở Personal)
+    override fun onResume() {
+        super.onResume()
+        val uri = SessionManager.getAvatarUri()
+        if (!uri.isNullOrBlank()) {
+            try {
+                binding.imgAvatar.setImageURI(Uri.parse(uri))
+            } catch (_: Exception) { }
+        }
     }
 
     private fun setupAdapters() {
@@ -74,11 +86,10 @@ class HomeFragment : Fragment() {
         binding.recyclerEvent.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = eventAdapter
-            setHasFixedSize(true)
+            setHasFixedSize(false)
         }
     }
 
-    // ── THÊM MỚI: lắng nghe EditText tìm kiếm ──────────────────────────────
     private fun setupSearch() {
         binding.edtSearch.addTextChangedListener { editable ->
             viewModel.onSearch(editable?.toString() ?: "")
@@ -101,9 +112,9 @@ class HomeFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.homeEvent.collect { event ->
                     when (event) {
-                        is HomeUiEvent.Toast -> {
+                        is HomeUiEvent.Toast ->
                             Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-                        }
+
                         is HomeUiEvent.navigateBack -> {
                             SessionManager.clear()
                             val rootNavController = (requireActivity() as MainActivity)
@@ -112,8 +123,7 @@ class HomeFragment : Fragment() {
                                 .let { it as androidx.navigation.fragment.NavHostFragment }
                                 .navController
                             rootNavController.navigate(
-                                R.id.auth_graph,
-                                null,
+                                R.id.auth_graph, null,
                                 NavOptions.Builder().setPopUpTo(R.id.root_graph, true).build()
                             )
                         }
@@ -138,14 +148,12 @@ class HomeFragment : Fragment() {
         })
     }
 
-    // ── Mở BottomSheet, truyền callback addToCart ───────────────────────────
     private fun showBottomSheet(event: Event) {
         if (parentFragmentManager.findFragmentByTag("event_bottom_sheet") != null) return
 
         HomeBottomSheet(
             event = event,
             onAddToCart = { ticketTypeId, qty ->
-                // Chạy trên IO, gọi cartRepo trực tiếp
                 val cartRepo = (requireActivity() as MainActivity).container.cartRepo
                 val result = cartRepo.addToCart(ticketTypeId, qty)
                 if (result is ApiResult.Error) {
