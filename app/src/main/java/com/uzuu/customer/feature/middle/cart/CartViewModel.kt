@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.uzuu.customer.core.result.ApiResult
 import com.uzuu.customer.domain.repository.CartRepository
+import com.uzuu.customer.domain.repository.OrderRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -12,7 +13,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CartViewModel(
-    private val cartRepo: CartRepository
+    private val cartRepo: CartRepository,
+    private val orderRepo: OrderRepository      // ← thêm
 ) : ViewModel() {
 
     private val _cartState = MutableStateFlow(CartUiState())
@@ -21,7 +23,6 @@ class CartViewModel(
     private val _cartEvent = MutableSharedFlow<CartUiEvent>(extraBufferCapacity = 3)
     val cartEvent = _cartEvent.asSharedFlow()
 
-    // Gọi khi fragment resume để luôn có dữ liệu mới nhất
     fun loadCart() {
         viewModelScope.launch {
             _cartState.update { it.copy(isLoading = true) }
@@ -30,15 +31,14 @@ class CartViewModel(
                     val cart = result.data
                     _cartState.update {
                         it.copy(
-                            isLoading = false,
-                            items = cart.items,
+                            isLoading   = false,
+                            items       = cart.items,
                             totalAmount = cart.totalAmount
                         )
                     }
                 }
                 is ApiResult.Error -> {
                     _cartState.update { it.copy(isLoading = false) }
-                    // Nếu giỏ trống, server có thể trả 404 – coi như rỗng
                     _cartEvent.emit(CartUiEvent.Toast(result.message))
                 }
             }
@@ -54,7 +54,9 @@ class CartViewModel(
             _cartState.update { it.copy(isLoading = true) }
             when (val result = cartRepo.clearCart()) {
                 is ApiResult.Success -> {
-                    _cartState.update { it.copy(isLoading = false, items = emptyList(), totalAmount = 0.0) }
+                    _cartState.update {
+                        it.copy(isLoading = false, items = emptyList(), totalAmount = 0.0)
+                    }
                     _cartEvent.emit(CartUiEvent.CartCleared)
                     _cartEvent.emit(CartUiEvent.Toast("Đã xóa toàn bộ giỏ hàng"))
                 }
@@ -76,12 +78,21 @@ class CartViewModel(
         }
         viewModelScope.launch {
             _cartState.update { it.copy(isLoading = true) }
+
             // Gọi POST /orders/checkout?paymentMethod=...
-            // Tạm thời emit success để demo flow
-            // TODO: inject OrderRepository khi có
-            _cartState.update { it.copy(isLoading = false) }
-            _cartEvent.emit(CartUiEvent.Toast("Đặt hàng thành công! Phương thức: ${state.selectedPayment}"))
-            _cartEvent.emit(CartUiEvent.CheckoutSuccess)
+            when (val result = orderRepo.checkout(state.selectedPayment)) {
+                is ApiResult.Success -> {
+                    _cartState.update { it.copy(isLoading = false) }
+                    _cartEvent.emit(CartUiEvent.Toast("🎉 Đặt hàng thành công!"))
+                    _cartEvent.emit(CartUiEvent.CheckoutSuccess)
+                    // CheckoutSuccess → CartFragment gọi loadCart()
+                    // Server đã clear cart sau checkout nên list sẽ rỗng
+                }
+                is ApiResult.Error -> {
+                    _cartState.update { it.copy(isLoading = false) }
+                    _cartEvent.emit(CartUiEvent.Toast(result.message))
+                }
+            }
         }
     }
 }

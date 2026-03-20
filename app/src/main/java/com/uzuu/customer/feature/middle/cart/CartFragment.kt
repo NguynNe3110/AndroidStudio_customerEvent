@@ -27,8 +27,9 @@ class CartFragment : Fragment() {
     private lateinit var cartAdapter: CartItemAdapter
 
     private val viewModel: CartViewModel by viewModels {
-        val cartRepo = (requireActivity() as MainActivity).container.cartRepo
-        CartFactory(cartRepo)
+        val cartRepo  = (requireActivity() as MainActivity).container.cartRepo
+        val orderRepo = (requireActivity() as MainActivity).container.orderRepo   // ← thêm
+        CartFactory(cartRepo, orderRepo)
     }
 
     private val priceFormatter = NumberFormat.getNumberInstance(Locale("vi", "VN"))
@@ -50,7 +51,6 @@ class CartFragment : Fragment() {
         observeEvent()
     }
 
-    // Luôn reload khi quay lại tab Cart
     override fun onResume() {
         super.onResume()
         viewModel.loadCart()
@@ -75,34 +75,23 @@ class CartFragment : Fragment() {
     }
 
     private fun setupButtons() {
-        binding.btnClearCart.setOnClickListener {
-            viewModel.onClearCart()
-        }
-        binding.btnCheckout.setOnClickListener {
-            viewModel.onCheckout()
-        }
+        binding.btnClearCart.setOnClickListener { viewModel.onClearCart() }
+        binding.btnCheckout.setOnClickListener  { viewModel.onCheckout() }
     }
 
     private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.cartState.collect { state ->
-
-                    // Loading
                     binding.progress.visibility = if (state.isLoading) View.VISIBLE else View.GONE
 
                     val isEmpty = state.items.isEmpty() && !state.isLoading
-                    binding.tvEmpty.visibility    = if (isEmpty) View.VISIBLE else View.GONE
-                    binding.recyclerCart.visibility  = if (!isEmpty) View.VISIBLE else View.GONE
-                    binding.cardCheckout.visibility  = if (!isEmpty) View.VISIBLE else View.GONE
+                    binding.tvEmpty.visibility      = if (isEmpty) View.VISIBLE else View.GONE
+                    binding.recyclerCart.visibility = if (!isEmpty) View.VISIBLE else View.GONE
+                    binding.cardCheckout.visibility = if (!isEmpty) View.VISIBLE else View.GONE
 
-                    // Submit list
                     cartAdapter.submitList(state.items)
-
-                    // Tổng tiền
                     binding.tvTotal.text = "${priceFormatter.format(state.totalAmount.toLong())}đ"
-
-                    // Sync dropdown text
                     binding.dropdownPayment.setText(state.selectedPayment, false)
                 }
             }
@@ -114,11 +103,14 @@ class CartFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.cartEvent.collect { event ->
                     when (event) {
-                        is CartUiEvent.Toast         -> Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                        is CartUiEvent.Toast         ->
+                            Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+
                         is CartUiEvent.CheckoutSuccess -> {
-                            // Reload giỏ (server đã clear sau checkout)
+                            // Server đã xoá cart sau checkout → reload để hiện empty state
                             viewModel.loadCart()
                         }
+
                         is CartUiEvent.CartCleared   -> { /* state đã reset trong VM */ }
                     }
                 }

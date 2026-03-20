@@ -6,7 +6,7 @@
     android:background="@color/blue_bg_2"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- ── Header card: avatar + tên ─────────────────────────────────────── -->
+    <!-- Header: avatar + tên -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,7 +21,6 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <!-- Avatar + camera badge -->
             <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
@@ -37,7 +36,6 @@
                     app:strokeWidth="2dp"
                     app:shapeAppearanceOverlay="@style/CircleImage"/>
 
-                <!-- Camera badge góc phải dưới -->
                 <com.google.android.material.imageview.ShapeableImageView
                     android:layout_width="22dp"
                     android:layout_height="22dp"
@@ -74,7 +72,6 @@
                     android:textColor="@color/blue_text_secondary"/>
             </LinearLayout>
 
-            <!-- Loading khi fetch my-info -->
             <ProgressBar
                 android:id="@+id/progress"
                 android:layout_width="24dp"
@@ -83,7 +80,7 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- ── Menu list ─────────────────────────────────────────────────────── -->
+    <!-- Menu list -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -103,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Row 1: Chỉnh sửa thông tin (có action) -->
+                <!-- Chỉnh sửa thông tin -->
                 <LinearLayout
                     android:id="@+id/row_edit_info"
                     android:layout_width="match_parent"
@@ -119,7 +116,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="Chỉnh sửa thông tin"
+                        android:text="✏️  Chỉnh sửa thông tin"
                         android:textSize="15sp"/>
 
                     <TextView
@@ -130,9 +127,40 @@
                         android:textColor="@color/blue_text_secondary"/>
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/blue_border_1"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/blue_border_1"/>
 
-                <!-- Row 2: Giao diện (placeholder) -->
+                <!-- Lịch sử đơn hàng ← ROW MỚI -->
+                <LinearLayout
+                    android:id="@+id/row_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="📋  Lịch sử đơn hàng"
+                        android:textSize="15sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textSize="22sp"
+                        android:textColor="@color/blue_text_secondary"/>
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/blue_border_1"/>
+
+                <!-- Giao diện (placeholder) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
@@ -144,7 +172,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="Giao diện"
+                        android:text="🎨  Giao diện"
                         android:textSize="15sp"
                         android:textColor="@color/blue_text_secondary"/>
 
@@ -159,9 +187,10 @@
                         android:paddingVertical="2dp"/>
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/blue_border_1"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/blue_border_1"/>
 
-                <!-- Row 3: Thông báo (placeholder) -->
+                <!-- Thông báo (placeholder) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
@@ -173,7 +202,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="Cài đặt thông báo"
+                        android:text="🔔  Thông báo"
                         android:textSize="15sp"
                         android:textColor="@color/blue_text_secondary"/>
 
@@ -188,9 +217,10 @@
                         android:paddingVertical="2dp"/>
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/blue_border_1"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/blue_border_1"/>
 
-                <!-- Row 4: Đổi mật khẩu (placeholder) -->
+                <!-- Trợ giúp -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
@@ -202,55 +232,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="Đổi mật khẩu"
-                        android:textSize="15sp"
-                        android:textColor="@color/blue_text_secondary"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sắp ra mắt"
-                        android:textSize="12sp"
-                        android:textColor="@color/blue_primary_400"
-                        android:background="@drawable/bg_border_blue_square"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="2dp"/>
-                </LinearLayout>
-
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/blue_border_1"/>
-
-                <!-- Row 5: Trợ giúp (placeholder) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="Trợ giúp"
-                        android:textSize="15sp"
-                        android:textColor="@color/blue_text_secondary"/>
-                </LinearLayout>
-
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/blue_border_1"/>
-
-                <!-- Row 6: Về ứng dụng (placeholder) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="Về ứng dụng"
+                        android:text="❓  Trợ giúp"
                         android:textSize="15sp"
                         android:textColor="@color/blue_text_secondary"/>
                 </LinearLayout>
@@ -258,7 +240,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Logout button -->
+        <!-- Logout -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_logout"
             android:layout_width="match_parent"

@@ -50,5 +50,5 @@ class AppContainer(context: Context) {
     val categoryRepo    = CategoryRepositoryImpl(categoryRemote)
     val cartRepo        = CartRepositoryImpl(cartRemote)
     val myTicketRepo    = MyTicketRepositoryImpl(myTicketRemote)   // ← thêm
-    val orderRepo       = OrderRepositoryImpl(orderRemote)          // ← thêm
+    val orderRepo       = OrderRepositoryImpl(orderRemote)        // ← thêm
 }

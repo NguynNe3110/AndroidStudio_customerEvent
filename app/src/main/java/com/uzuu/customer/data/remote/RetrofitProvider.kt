@@ -4,6 +4,8 @@ import com.uzuu.customer.data.remote.api.AuthApi
 import com.uzuu.customer.data.remote.api.CartApi
 import com.uzuu.customer.data.remote.api.CategoryApi
 import com.uzuu.customer.data.remote.api.EventApi
+import com.uzuu.customer.data.remote.api.MyTicketApi
+import com.uzuu.customer.data.remote.api.OrderApi
 import com.uzuu.customer.data.remote.api.UserApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -47,4 +49,6 @@ object RetrofitProvider {
 
     val cartApi: CartApi by lazy { retrofit.create(CartApi::class.java) }
     val userApi: UserApi by lazy { retrofit.create(UserApi::class.java) }
+    val myTicketApi: MyTicketApi by lazy { retrofit.create(MyTicketApi::class.java) }   // ← thêm
+    val orderApi: OrderApi by lazy { retrofit.create(OrderApi::class.java) }
 }

@@ -16,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.uzuu.customer.R
 import com.uzuu.customer.data.session.SessionManager
 import com.uzuu.customer.databinding.FragmentPersonalBinding
@@ -27,12 +28,10 @@ class PersonalFragment : Fragment() {
     private var _binding: FragmentPersonalBinding? = null
     val binding get() = _binding!!
 
-    // ── Chọn ảnh từ gallery ───────────────────────────────────────────────────
     private val pickImage = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            // Giữ quyền đọc URI vĩnh viễn (tránh mất quyền sau restart)
             try {
                 requireContext().contentResolver.takePersistableUriPermission(
                     it, Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -63,17 +62,19 @@ class PersonalFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Click vào avatar → mở gallery
         binding.imgAvatar.setOnClickListener {
             pickImage.launch("image/*")
         }
 
-        // Row chỉnh sửa thông tin
         binding.rowEditInfo.setOnClickListener {
             viewModel.onEditInfo()
         }
 
-        // Đăng xuất
+        // ── Lịch sử đơn hàng ────────────────────────────────────────────────
+        binding.rowHistory.setOnClickListener {
+            findNavController().navigate(R.id.action_personal_to_history)
+        }
+
         binding.btnLogout.setOnClickListener {
             SessionManager.clear()
             val rootNavController = (requireActivity() as MainActivity)
@@ -82,11 +83,8 @@ class PersonalFragment : Fragment() {
                 .let { it as NavHostFragment }
                 .navController
             rootNavController.navigate(
-                R.id.auth_graph,
-                null,
-                NavOptions.Builder()
-                    .setPopUpTo(R.id.root_graph, true)
-                    .build()
+                R.id.auth_graph, null,
+                NavOptions.Builder().setPopUpTo(R.id.root_graph, true).build()
             )
         }
     }
@@ -95,19 +93,16 @@ class PersonalFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
-
-                    // Avatar
                     if (!state.avatarUri.isNullOrBlank()) {
-                        try {
-                            binding.imgAvatar.setImageURI(Uri.parse(state.avatarUri))
-                        } catch (_: Exception) { }
+                        Glide.with(this@PersonalFragment)
+                            .load(Uri.parse(state.avatarUri))
+                            .circleCrop()
+                            .placeholder(R.drawable.avatar)
+                            .error(R.drawable.avatar)
+                            .into(binding.imgAvatar)
                     }
-
-                    // Tên hiển thị — ưu tiên fullName, fallback về username
                     val displayName = state.fullName.ifBlank { state.username }
                     binding.txtDisplayName.text = "Xin chào: $displayName"
-
-                    // Loading overlay (tuỳ chọn)
                     binding.progress.visibility = if (state.isLoading) View.VISIBLE else View.GONE
                 }
             }
@@ -121,11 +116,9 @@ class PersonalFragment : Fragment() {
                     when (event) {
                         is PersonalUiEvent.Toast ->
                             Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-
                         is PersonalUiEvent.NavigateToEditInfo ->
                             findNavController().navigate(R.id.action_personal_to_editInfo)
-
-                        is PersonalUiEvent.NavigateToLogin -> { /* handled by logout button */ }
+                        is PersonalUiEvent.NavigateToLogin -> { }
                     }
                 }
             }

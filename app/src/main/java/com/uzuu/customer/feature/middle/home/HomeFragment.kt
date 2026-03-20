@@ -2,6 +2,7 @@ package com.uzuu.customer.feature.middle.home
 
 import android.net.Uri
 import android.os.Bundle
+import com.bumptech.glide.Glide
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,9 +65,12 @@ class HomeFragment : Fragment() {
         super.onResume()
         val uri = SessionManager.getAvatarUri()
         if (!uri.isNullOrBlank()) {
-            try {
-                binding.imgAvatar.setImageURI(Uri.parse(uri))
-            } catch (_: Exception) { }
+            Glide.with(this)
+                .load(Uri.parse(uri))
+                .circleCrop()
+                .placeholder(R.drawable.avatar)
+                .error(R.drawable.avatar)
+                .into(binding.imgAvatar)
         }
     }
 

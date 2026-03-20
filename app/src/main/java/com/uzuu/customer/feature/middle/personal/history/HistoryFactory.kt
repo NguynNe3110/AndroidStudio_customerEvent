@@ -1,18 +1,16 @@
-package com.uzuu.customer.feature.middle.cart
+package com.uzuu.customer.feature.middle.personal.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.uzuu.customer.domain.repository.CartRepository
 import com.uzuu.customer.domain.repository.OrderRepository
 
-class CartFactory(
-    private val cartRepo: CartRepository,
-    private val orderRepo: OrderRepository      // ← thêm
+class HistoryFactory(
+    private val orderRepo: OrderRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CartViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(HistoryViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return CartViewModel(cartRepo, orderRepo) as T
+            return HistoryViewModel(orderRepo) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
