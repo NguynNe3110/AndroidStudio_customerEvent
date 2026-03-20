@@ -12,6 +12,11 @@
             android:name="usernameStr"
             app:argType="string"
             android:defaultValue=""/>
+
+        <!-- Action sang màn chi tiết sự kiện -->
+        <action
+            android:id="@+id/action_homeFragment_to_eventDetail"
+            app:destination="@id/eventDetailFragment" />
     </fragment>
 
     <fragment
@@ -28,8 +33,6 @@
         android:id="@+id/personalFragment"
         android:name="com.uzuu.customer.feature.middle.personal.PersonalFragment"
         android:label="Personal">
-
-        <!-- Action sang màn edit thông tin -->
         <action
             android:id="@+id/action_personal_to_editInfo"
             app:destination="@id/personalInfoFragment"/>
@@ -39,5 +42,15 @@
         android:id="@+id/personalInfoFragment"
         android:name="com.uzuu.customer.feature.middle.personal.PersonalInfoFragment"
         android:label="Chỉnh sửa thông tin"/>
+
+    <!-- Màn hình chi tiết sự kiện -->
+    <fragment
+        android:id="@+id/eventDetailFragment"
+        android:name="com.uzuu.customer.feature.middle.home.EventDetailFragment"
+        android:label="Chi tiết sự kiện">
+        <argument
+            android:name="event"
+            app:argType="com.uzuu.customer.domain.model.Event" />
+    </fragment>
 
 </navigation>

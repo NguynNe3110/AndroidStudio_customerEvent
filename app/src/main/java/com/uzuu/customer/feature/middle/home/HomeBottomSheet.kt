@@ -6,17 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.uzuu.customer.databinding.BottomsheetEventBinding
 import com.uzuu.customer.domain.model.Event
 import com.uzuu.customer.ui.adapter.CategoryTicketAdapter
+import com.uzuu.customer.ui.adapter.EventAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class HomeBottomSheet(
     private val event: Event,
-    // Callback suspend: fragment gọi cartRepo.addToCart bên ngoài
     private val onAddToCart: suspend (ticketTypeId: Long, quantity: Int) -> Unit
 ) : BottomSheetDialogFragment() {
 
@@ -41,10 +43,10 @@ class HomeBottomSheet(
     }
 
     private fun bindEventInfo() {
-        binding.txtNameEvent.text       = event.name
-        binding.txtAddress.text         = "📍 ${event.location}"
-        binding.txtDateTimeStart.text   = "Bắt đầu: ${event.startTime ?: "Chưa xác định"}"
-        binding.txtDateTimeEnd.text     = "Kết thúc: ${event.endTime ?: "Chưa xác định"}"
+        binding.txtNameEvent.text     = event.name
+        binding.txtAddress.text       = "📍 ${event.location}"
+        binding.txtDateTimeStart.text = "Bắt đầu: ${event.startTime ?: "Chưa xác định"}"
+        binding.txtDateTimeEnd.text   = "Kết thúc: ${event.endTime ?: "Chưa xác định"}"
     }
 
     private fun setupTicketRecycler() {
@@ -57,11 +59,18 @@ class HomeBottomSheet(
     }
 
     private fun setupButtons() {
-        binding.txtViewDetail.setOnClickListener {
-            Toast.makeText(context, "Xem chi tiết: ${event.name}", Toast.LENGTH_SHORT).show()
-        }
-
         binding.handleBar.setOnClickListener { dismiss() }
+
+        // ── Xem chi tiết → navigate sang EventDetailFragment ────────────────
+        binding.txtViewDetail.setOnClickListener {
+            dismiss()
+            // Tìm navController từ fragment cha (HomeFragment nằm trong main_graph)
+            val parentFragment = parentFragmentManager.fragments
+                .filterIsInstance<HomeFragment>()
+                .firstOrNull()
+            parentFragment?.findNavController()
+                ?.navigate(HomeFragmentDirections.actionHomeFragmentToEventDetail(event))
+        }
 
         // ── Thêm vào giỏ ────────────────────────────────────────────────────
         binding.btnAddToCart.setOnClickListener {
@@ -71,19 +80,13 @@ class HomeBottomSheet(
                 return@setOnClickListener
             }
 
-            // Disable button tránh bấm 2 lần
             binding.btnAddToCart.isEnabled = false
-
             lifecycleScope.launch(Dispatchers.IO) {
                 var hasError = false
                 selected.forEach { (ticketTypeId, qty) ->
-                    try {
-                        onAddToCart(ticketTypeId, qty)
-                    } catch (e: Exception) {
-                        hasError = true
-                    }
+                    try { onAddToCart(ticketTypeId, qty) }
+                    catch (e: Exception) { hasError = true }
                 }
-
                 launch(Dispatchers.Main) {
                     binding.btnAddToCart.isEnabled = true
                     if (hasError) {
@@ -101,7 +104,7 @@ class HomeBottomSheet(
             }
         }
 
-        // ── Mua ngay: thêm vào giỏ → fragment sẽ điều hướng tới Cart ────────
+        // ── Mua ngay ────────────────────────────────────────────────────────
         binding.btnBuyNow.setOnClickListener {
             val selected = ticketAdapter.getSelectedQuantities()
             if (selected.isEmpty()) {
@@ -110,16 +113,12 @@ class HomeBottomSheet(
             }
 
             binding.btnBuyNow.isEnabled = false
-
             lifecycleScope.launch(Dispatchers.IO) {
-                selected.forEach { (ticketTypeId, qty) ->
-                    onAddToCart(ticketTypeId, qty)
-                }
+                selected.forEach { (ticketTypeId, qty) -> onAddToCart(ticketTypeId, qty) }
                 launch(Dispatchers.Main) {
                     binding.btnBuyNow.isEnabled = true
                     Toast.makeText(context, "Đã thêm vào giỏ – chuyển đến trang thanh toán", Toast.LENGTH_SHORT).show()
                     dismiss()
-                    // TODO: navigate tới CartFragment nếu muốn tự động chuyển tab
                 }
             }
         }

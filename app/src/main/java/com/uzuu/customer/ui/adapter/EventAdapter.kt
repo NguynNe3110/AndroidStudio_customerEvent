@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.uzuu.customer.databinding.ItemEndHomeBinding
 import com.uzuu.customer.databinding.ItemStartHomeBinding
 import com.uzuu.customer.domain.model.Event
@@ -18,83 +19,73 @@ class EventAdapter(
         private const val TYPE_END = 1
 
         private val DIFF = object : DiffUtil.ItemCallback<Event>() {
-            override fun areItemsTheSame(oldItem: Event, newItem: Event): Boolean {
-                return oldItem.id == newItem.id
-            }
+            override fun areItemsTheSame(oldItem: Event, newItem: Event) = oldItem.id == newItem.id
+            override fun areContentsTheSame(oldItem: Event, newItem: Event) = oldItem == newItem
+        }
 
-            override fun areContentsTheSame(oldItem: Event, newItem: Event): Boolean {
-                return oldItem == newItem
-            }
+        /**
+         * Server trả về URL dạng http://localhost:8080/...
+         * Trên điện thoại thực thì localhost không trỏ được tới máy tính.
+         * Hàm này thay thế "localhost" bằng IP thực của máy chủ.
+         */
+        fun fixImageUrl(url: String?): String? {
+            if (url.isNullOrBlank()) return null
+            return url.replace("http://localhost", "http://192.168.1.9")
+                .replace("https://localhost", "http://192.168.1.9")
         }
     }
 
-    // 🧠 Quyết định layout ở đây
-    override fun getItemViewType(position: Int): Int {
-        val item = getItem(position)
+    inner class StartVH(val binding: ItemStartHomeBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class EndVH(val binding: ItemEndHomeBinding) : RecyclerView.ViewHolder(binding.root)
 
-        return if (item.status == "PENDING") {
-            TYPE_START
-        } else {
-            TYPE_END
-        }
-    }
+    override fun getItemViewType(position: Int): Int =
+        if (getItem(position).status == "PENDING") TYPE_START else TYPE_END
 
-    // 🧱 ViewHolder 1
-    inner class StartVH(val binding: ItemStartHomeBinding) :
-        RecyclerView.ViewHolder(binding.root)
-
-    // 🧱 ViewHolder 2
-    inner class EndVH(val binding: ItemEndHomeBinding) :
-        RecyclerView.ViewHolder(binding.root)
-
-    // 🏗 create viewholder
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
-
-            TYPE_START -> {
-                val binding = ItemStartHomeBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
-                StartVH(binding)
-            }
-
-            TYPE_END -> {
-                val binding = ItemEndHomeBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
-                EndVH(binding)
-            }
-
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        when (viewType) {
+            TYPE_START -> StartVH(
+                ItemStartHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
+            TYPE_END -> EndVH(
+                ItemEndHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
             else -> throw IllegalArgumentException("Invalid viewType")
         }
-    }
 
-    // 🔗 bind data
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
+        val minPrice = item.ticketTypes.minOfOrNull { it.price }
+        val priceText = if (minPrice != null) "${minPrice.toLong()}đ" else "Liên hệ"
+        val imageUrl = fixImageUrl(item.imageUrls.firstOrNull())
 
         when (holder) {
+            is StartVH -> with(holder.binding) {
+                txtNameEventStart.text = item.name
+                txtAddressStart.text = item.location
+                txtPriceStart.text = priceText
+                txtStatusStart.text = "● ${item.status}"
+                txtTicketQuantityStart.text = "Số vé còn: ${item.ticketTypes.sumOf { it.remainingQuantity }}"
 
-            is StartVH -> {
-                holder.binding.txtNameEventStart.text = item.name
-                holder.binding.txtAddressStart.text = item.location
-                val minPrice = item.ticketTypes.minOfOrNull { it.price }
-                holder.binding.txtPriceStart.text = if (minPrice != null) "${minPrice.toLong()}đ" else "Liên hệ"
-                holder.binding.txtStatusStart.text = item.status
-                holder.binding.root.setOnClickListener { onClick(item) }
+                Glide.with(imgEventStart)
+                    .load(imageUrl)
+                    .centerCrop()
+                    .into(imgEventStart)
+
+                root.setOnClickListener { onClick(item) }
             }
 
-            is EndVH -> {
-                holder.binding.txtNameEventEnd.text = item.name
-                holder.binding.txtAddressEnd.text = item.location
-                val minPrice = item.ticketTypes.minOfOrNull { it.price }
-                holder.binding.txtPriceEnd.text = if (minPrice != null) "${minPrice.toLong()}đ" else "Liên hệ"
-                holder.binding.txtStatusEnd.text = item.status
-                holder.binding.root.setOnClickListener { onClick(item) }
+            is EndVH -> with(holder.binding) {
+                txtNameEventEnd.text = item.name
+                txtAddressEnd.text = item.location
+                txtPriceEnd.text = priceText
+                txtStatusEnd.text = "● ${item.status}"
+
+                Glide.with(imgEventEnd)
+                    .load(imageUrl)
+                    .centerCrop()
+                    .into(imgEventEnd)
+
+                root.setOnClickListener { onClick(item) }
             }
         }
     }
