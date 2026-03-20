@@ -21,7 +21,7 @@ class HistoryViewModel(
     private val _event = MutableSharedFlow<String>(extraBufferCapacity = 3)
     val event = _event.asSharedFlow()
 
-    private var currentPage = 0
+    private var currentPage = 1
 
     fun loadOrders() {
         // Tránh load nhiều lần

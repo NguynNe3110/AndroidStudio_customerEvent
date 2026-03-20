@@ -34,6 +34,7 @@ class PersonalViewModel(
             when (val r = userRepo.getMyInfo()) {
                 is ApiResult.Success -> {
                     val u = r.data
+                    println("DEBUG[PersonalViewModel] du lieu server trả về $u")
                     // Lưu username để dùng khi update
                     SessionManager.saveUsername(u.username)
                     _state.update {
