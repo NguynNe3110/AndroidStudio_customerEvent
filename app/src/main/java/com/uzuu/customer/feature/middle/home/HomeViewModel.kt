@@ -6,7 +6,9 @@ import com.uzuu.customer.domain.model.CategoryItem
 import com.uzuu.customer.domain.model.Event
 import com.uzuu.customer.domain.repository.CategoryRepository
 import com.uzuu.customer.domain.repository.EventRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -25,6 +27,8 @@ class HomeViewModel(
 
     private val _homeEvent = MutableSharedFlow<HomeUiEvent>(extraBufferCapacity = 3)
     val homeEvent = _homeEvent.asSharedFlow()
+
+    private var pollingJob: Job? = null
 
     fun init() {
         viewModelScope.launch {
@@ -161,5 +165,45 @@ class HomeViewModel(
         }
 
         return result
+    }
+
+    fun startPolling(intervalMs: Long = 30_000L) {
+        stopPolling()
+        pollingJob = viewModelScope.launch {
+            while (true) {
+                delay(intervalMs)
+                refresh()  // hàm refresh() ở Cách 1
+                println("DEBUG [HomeViewModel] polling refreshed")
+            }
+        }
+    }
+
+    fun stopPolling() {
+        pollingJob?.cancel()
+        pollingJob = null
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            try {
+                val result = eventRepo.getEvent(1)
+                currentPage = 2
+                _homeState.update { state ->
+                    val filtered = filterByCategoryAndQuery(
+                        events     = result.data,
+                        categoryId = state.selectedCategoryId,
+                        categories = state.categories,
+                        query      = state.searchQuery
+                    )
+                    state.copy(
+                        allEvents  = result.data,
+                        events     = filtered,
+                        isLastPage = result.isLast
+                    )
+                }
+            } catch (e: Exception) {
+                println("DEBUG [HomeViewModel] refresh ERROR: ${e.message}")
+            }
+        }
     }
 }

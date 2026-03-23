@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.uzuu.customer.R
@@ -26,12 +27,29 @@ class MainFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         val navHostFragment =
             childFragmentManager.findFragmentById(R.id.main_nav_host) as NavHostFragment
-
         val navController = navHostFragment.navController
 
-        binding.bottomNav.setupWithNavController(navController)
+        // Thay vì setupWithNavController trực tiếp, override listener
+        binding.bottomNav.setOnItemSelectedListener { item ->
+            val navOptions = NavOptions.Builder()
+                .setLaunchSingleTop(true)
+                .setRestoreState(false)
+                // Pop hết về start destination của graph trước khi navigate
+                .setPopUpTo(navController.graph.startDestinationId, inclusive = false, saveState = false)
+                .build()
+            return@setOnItemSelectedListener try {
+                navController.navigate(item.itemId, null, navOptions)
+                true
+            } catch (e: Exception) {
+                false
+            }
+        }
+
+        // Vẫn sync highlight icon với navController
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            binding.bottomNav.menu.findItem(destination.id)?.isChecked = true
+        }
     }
 }

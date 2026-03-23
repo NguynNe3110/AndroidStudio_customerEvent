@@ -47,16 +47,17 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:paddingLeft="5dp"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:paddingLeft="12dp"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/blue_primary_650"
         android:text="Danh mục"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="18dp"
         android:minHeight="50dp"
-        android:layout_marginTop="16dp"
         android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -73,15 +74,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
+        android:layout_marginTop="12dp"
+        android:paddingLeft="12dp"
         android:orientation="horizontal">
         <TextView
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:gravity="center_vertical"
             android:paddingLeft="5dp"
+            android:textStyle="bold"
+            android:textColor="@color/blue_primary_650"
             android:text="Các sự kiện nổi bật"/>
     </LinearLayout>
     <LinearLayout
