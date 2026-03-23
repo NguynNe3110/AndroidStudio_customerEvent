@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Hộp quét QR: nền trong suốt, viền bo góc màu trắng.
+    4 góc bo dày được tạo thêm bằng layer-list.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Nền trong suốt -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000"/>
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+
+    <!-- Viền trắng mỏng toàn khung -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000"/>
+            <stroke android:width="2dp" android:color="#AAFFFFFF"/>
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+
+    <!-- Góc trên-trái -->
+    <item android:top="0dp" android:left="0dp" android:right="210dp" android:bottom="210dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000"/>
+            <stroke android:width="5dp" android:color="#FFFFFF"/>
+            <corners
+                android:topLeftRadius="12dp"
+                android:topRightRadius="0dp"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp"/>
+        </shape>
+    </item>
+
+    <!-- Góc trên-phải -->
+    <item android:top="0dp" android:left="210dp" android:right="0dp" android:bottom="210dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000"/>
+            <stroke android:width="5dp" android:color="#FFFFFF"/>
+            <corners
+                android:topLeftRadius="0dp"
+                android:topRightRadius="12dp"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp"/>
+        </shape>
+    </item>
+
+    <!-- Góc dưới-trái -->
+    <item android:top="210dp" android:left="0dp" android:right="210dp" android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000"/>
+            <stroke android:width="5dp" android:color="#FFFFFF"/>
+            <corners
+                android:topLeftRadius="0dp"
+                android:topRightRadius="0dp"
+                android:bottomLeftRadius="12dp"
+                android:bottomRightRadius="0dp"/>
+        </shape>
+    </item>
+
+    <!-- Góc dưới-phải -->
+    <item android:top="210dp" android:left="210dp" android:right="0dp" android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000"/>
+            <stroke android:width="5dp" android:color="#FFFFFF"/>
+            <corners
+                android:topLeftRadius="0dp"
+                android:topRightRadius="0dp"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="12dp"/>
+        </shape>
+    </item>
+
+</layer-list>
