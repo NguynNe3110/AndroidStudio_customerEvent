@@ -11,31 +11,38 @@ class OrderRepositoryImpl(
     private val remote: OrderRemoteDataSource
 ) : OrderRepository {
 
+    private fun isOk(code: Int) = code == 200 || code == 0 || code == 1000
+
     override suspend fun checkout(paymentMethod: String): ApiResult<Order> =
         safeApiCall {
-            val response = remote.checkout(paymentMethod)
-            if (response.code == 200 || response.code == 0 || response.code == 1000) {
-                response.result.toDomain()
-            } else {
-                throw Exception(response.message ?: "Thanh toán thất bại")
-            }
+            val r = remote.checkout(paymentMethod)
+            if (isOk(r.code)) r.result.toDomain()
+            else throw Exception(r.message ?: "Thanh toán thất bại")
+        }
+
+    override suspend fun checkoutSelected(
+        paymentMethod: String,
+        itemIds: List<Long>
+    ): ApiResult<Order> =
+        safeApiCall {
+            val r = remote.checkoutSelected(paymentMethod, itemIds)
+            if (isOk(r.code)) r.result.toDomain()
+            else throw Exception(r.message ?: "Thanh toán thất bại")
         }
 
     override suspend fun getMyOrders(page: Int): ApiResult<PagedResult<Order>> =
         safeApiCall {
-            val response = remote.getMyOrders(page)
-            if (response.code == 200 || response.code == 0 || response.code == 1000) {
-                val pageData = response.result
+            val r = remote.getMyOrders(page)
+            if (isOk(r.code)) {
+                val p = r.result
                 PagedResult(
-                    data          = pageData.content.map { it.toDomain() },
-                    page          = pageData.number,
-                    totalPages    = pageData.totalPages,
-                    totalElements = pageData.totalElements,
-                    isLast        = pageData.last
+                    data          = p.content.map { it.toDomain() },
+                    page          = p.number,
+                    totalPages    = p.totalPages,
+                    totalElements = p.totalElements,
+                    isLast        = p.last
                 )
-            } else {
-                throw Exception(response.message ?: "Không lấy được lịch sử đơn hàng")
-            }
+            } else throw Exception(r.message ?: "Không lấy được lịch sử đơn hàng")
         }
 }
 

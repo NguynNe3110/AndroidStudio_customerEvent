@@ -5,14 +5,17 @@ import com.uzuu.customer.data.remote.dto.BaseResponseDto
 import com.uzuu.customer.data.remote.dto.response.OrderResponseDto
 import com.uzuu.customer.data.remote.dto.response.PageResponse
 
-class OrderRemoteDataSource(
-    private val orderApi: OrderApi
-) {
-    suspend fun checkout(paymentMethod: String): BaseResponseDto<OrderResponseDto> {
-        return orderApi.checkout(paymentMethod)
-    }
+class OrderRemoteDataSource(private val orderApi: OrderApi) {
 
-    suspend fun getMyOrders(page: Int): BaseResponseDto<PageResponse<OrderResponseDto>> {
-        return orderApi.getMyOrders(page, 20)
-    }
+    suspend fun checkout(paymentMethod: String): BaseResponseDto<OrderResponseDto> =
+        orderApi.checkout(paymentMethod)
+
+    suspend fun checkoutSelected(
+        paymentMethod: String,
+        itemIds: List<Long>
+    ): BaseResponseDto<OrderResponseDto> =
+        orderApi.checkoutSelected(paymentMethod, itemIds)
+
+    suspend fun getMyOrders(page: Int): BaseResponseDto<PageResponse<OrderResponseDto>> =
+        orderApi.getMyOrders(page, 20)
 }

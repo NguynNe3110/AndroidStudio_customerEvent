@@ -32,12 +32,10 @@ class CartFragment : Fragment() {
         CartFactory(cartRepo, orderRepo)
     }
 
-    private val priceFormatter = NumberFormat.getNumberInstance(Locale("vi", "VN"))
+    private val fmt = NumberFormat.getNumberInstance(Locale("vi", "VN"))
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCartBinding.inflate(inflater, container, false)
         return binding.root
@@ -57,7 +55,14 @@ class CartFragment : Fragment() {
     }
 
     private fun setupRecycler() {
-        cartAdapter = CartItemAdapter()
+        cartAdapter = CartItemAdapter(
+            onCheckedChange = { itemId, checked ->
+                // Nếu user tick thủ công → cập nhật state
+                viewModel.toggleItemSelection(itemId)
+            },
+            onDelete = { itemId -> viewModel.deleteItem(itemId) },
+            onQuantityChange = { itemId, qty -> viewModel.updateItemQuantity(itemId, qty) }
+        )
         binding.recyclerCart.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = cartAdapter
@@ -67,31 +72,64 @@ class CartFragment : Fragment() {
 
     private fun setupPaymentDropdown() {
         val methods = listOf("BANKING", "MOMO", "VNPAY")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, methods)
+        val adapter = ArrayAdapter(
+            requireContext(), android.R.layout.simple_dropdown_item_1line, methods
+        )
         binding.dropdownPayment.setAdapter(adapter)
-        binding.dropdownPayment.setOnItemClickListener { _, _, position, _ ->
-            viewModel.onPaymentSelected(methods[position])
+        binding.dropdownPayment.setOnItemClickListener { _, _, pos, _ ->
+            viewModel.onPaymentSelected(methods[pos])
         }
     }
 
     private fun setupButtons() {
         binding.btnClearCart.setOnClickListener { viewModel.onClearCart() }
-        binding.btnCheckout.setOnClickListener  { viewModel.onCheckout() }
+        binding.btnCheckout.setOnClickListener { viewModel.onCheckout() }
+        binding.btnCheckoutSelected.setOnClickListener { viewModel.onCheckoutSelected() }
+        binding.btnDeleteSelected.setOnClickListener { viewModel.deleteSelectedItems() }
+
+        binding.checkboxSelectAll.setOnCheckedChangeListener { _, _ ->
+            viewModel.toggleSelectAll()
+        }
     }
 
     private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.cartState.collect { state ->
+                    // Loading
                     binding.progress.visibility = if (state.isLoading) View.VISIBLE else View.GONE
 
+                    // Empty / content
                     val isEmpty = state.items.isEmpty() && !state.isLoading
-                    binding.tvEmpty.visibility      = if (isEmpty) View.VISIBLE else View.GONE
-                    binding.recyclerCart.visibility = if (!isEmpty) View.VISIBLE else View.GONE
-                    binding.cardCheckout.visibility = if (!isEmpty) View.VISIBLE else View.GONE
+                    binding.tvEmpty.visibility         = if (isEmpty) View.VISIBLE else View.GONE
+                    binding.recyclerCart.visibility    = if (!isEmpty) View.VISIBLE else View.GONE
+                    binding.cardCheckout.visibility    = if (!isEmpty) View.VISIBLE else View.GONE
+                    binding.toolbarSelection.visibility = if (!isEmpty) View.VISIBLE else View.GONE
 
+                    // Danh sách
+                    cartAdapter.selectedIds = state.selectedItemIds
                     cartAdapter.submitList(state.items)
-                    binding.tvTotal.text = "${priceFormatter.format(state.totalAmount.toLong())}đ"
+
+                    // Checkbox chọn tất cả (tránh vòng lặp)
+                    binding.checkboxSelectAll.setOnCheckedChangeListener(null)
+                    binding.checkboxSelectAll.isChecked = state.isAllSelected
+                    binding.checkboxSelectAll.setOnCheckedChangeListener { _, _ ->
+                        viewModel.toggleSelectAll()
+                    }
+
+                    // Hiển thị tổng tiền: nếu đang chọn → hiện tổng đã chọn
+                    val totalToShow = if (state.hasSelection) state.selectedTotal else state.totalAmount
+                    val label = if (state.hasSelection)
+                        "Đã chọn (${state.selectedItemIds.size}):"
+                    else
+                        "Tổng cộng:"
+                    binding.tvTotalLabel.text = label
+                    binding.tvTotal.text = "${fmt.format(totalToShow.toLong())}đ"
+
+                    // Nút checkout-selected chỉ active khi có lựa chọn
+                    binding.btnCheckoutSelected.isEnabled = state.hasSelection
+                    binding.btnDeleteSelected.isEnabled   = state.hasSelection
+
                     binding.dropdownPayment.setText(state.selectedPayment, false)
                 }
             }
@@ -103,14 +141,11 @@ class CartFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.cartEvent.collect { event ->
                     when (event) {
-                        is CartUiEvent.Toast         ->
+                        is CartUiEvent.Toast ->
                             Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-
-                        is CartUiEvent.CheckoutSuccess -> {
-                            viewModel.loadCart()
-                        }
-
-                        is CartUiEvent.CartCleared   -> { /* state đã reset trong VM */ }
+                        is CartUiEvent.CheckoutSuccess -> viewModel.loadCart()
+                        is CartUiEvent.CartCleared,
+                        is CartUiEvent.ItemDeleted -> { /* state đã cập nhật trong VM */ }
                     }
                 }
             }

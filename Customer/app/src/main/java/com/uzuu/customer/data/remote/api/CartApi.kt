@@ -7,6 +7,9 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface CartApi {
 
@@ -20,4 +23,15 @@ interface CartApi {
 
     @DELETE("cart/clear")
     suspend fun clearCart(): BaseResponseDto<Any>
+
+    @PUT("cart/items/{itemId}")
+    suspend fun updateCartItem(
+        @Path("itemId") itemId: Long,
+        @Query("quantity") quantity: Int
+    ): BaseResponseDto<CartResponseDto>
+
+    @DELETE("cart/items/{itemId}")
+    suspend fun deleteCartItem(
+        @Path("itemId") itemId: Long
+    ): BaseResponseDto<CartResponseDto>
 }

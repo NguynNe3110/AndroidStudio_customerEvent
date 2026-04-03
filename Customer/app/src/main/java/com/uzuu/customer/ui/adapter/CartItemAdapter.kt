@@ -10,7 +10,11 @@ import com.uzuu.customer.domain.model.CartItem
 import java.text.NumberFormat
 import java.util.Locale
 
-class CartItemAdapter : ListAdapter<CartItem, CartItemAdapter.VH>(DIFF) {
+class CartItemAdapter(
+    private val onCheckedChange: (itemId: Long, checked: Boolean) -> Unit,
+    private val onDelete: (itemId: Long) -> Unit,
+    private val onQuantityChange: (itemId: Long, newQty: Int) -> Unit
+) : ListAdapter<CartItem, CartItemAdapter.VH>(DIFF) {
 
     companion object {
         private val DIFF = object : DiffUtil.ItemCallback<CartItem>() {
@@ -19,6 +23,13 @@ class CartItemAdapter : ListAdapter<CartItem, CartItemAdapter.VH>(DIFF) {
         }
         private val fmt = NumberFormat.getNumberInstance(Locale("vi", "VN"))
     }
+
+    /** Set id đang được chọn — cập nhật từ Fragment khi state thay đổi */
+    var selectedIds: Set<Long> = emptySet()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     inner class VH(val binding: ItemCartItemBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -32,11 +43,29 @@ class CartItemAdapter : ListAdapter<CartItem, CartItemAdapter.VH>(DIFF) {
     override fun onBindViewHolder(holder: VH, position: Int) {
         val item = getItem(position)
         with(holder.binding) {
-            tvEventName.text    = item.eventName
-            tvTicketType.text   = item.ticketTypeName
-            tvUnitPrice.text    = "${fmt.format(item.unitPrice.toLong())}đ / vé"
-            tvQuantity.text     = "× ${item.quantity}"
-            tvSubtotal.text     = "${fmt.format(item.subtotal.toLong())}đ"
+            tvEventName.text   = item.eventName
+            tvTicketType.text  = item.ticketTypeName
+            tvUnitPrice.text   = "${fmt.format(item.unitPrice.toLong())}đ / vé"
+            tvQuantity.text    = item.quantity.toString()
+            tvSubtotal.text    = "${fmt.format(item.subtotal.toLong())}đ"
+
+            // Checkbox chọn để thanh toán / xóa
+            checkboxSelect.setOnCheckedChangeListener(null)      // tránh vòng lặp
+            checkboxSelect.isChecked = item.id in selectedIds
+            checkboxSelect.setOnCheckedChangeListener { _, checked ->
+                onCheckedChange(item.id, checked)
+            }
+
+            // Nút xóa riêng lẻ
+            btnDelete.setOnClickListener { onDelete(item.id) }
+
+            // Tăng / giảm số lượng
+            btnMinus.setOnClickListener {
+                onQuantityChange(item.id, item.quantity - 1)
+            }
+            btnPlus.setOnClickListener {
+                onQuantityChange(item.id, item.quantity + 1)
+            }
         }
     }
 }

@@ -26,8 +26,8 @@ class EventAdapter(
 
         fun fixImageUrl(url: String?): String? {
             if (url.isNullOrBlank()) return null
-            return url.replace("http://localhost", "http://192.168.0.110")
-                .replace("https://localhost", "http://192.168.0.110")
+            return url.replace("http://localhost", "http://192.168.51.88")
+                .replace("https://localhost", "http://192.168.51.88")
         }
     }
 

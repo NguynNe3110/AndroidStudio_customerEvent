@@ -4,4 +4,5 @@ sealed class CartUiEvent {
     data class Toast(val message: String) : CartUiEvent()
     object CheckoutSuccess : CartUiEvent()
     object CartCleared : CartUiEvent()
+    object ItemDeleted : CartUiEvent()
 }
