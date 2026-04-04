@@ -86,6 +86,24 @@ class PersonalFragment : Fragment() {
                 NavOptions.Builder().setPopUpTo(R.id.root_graph, true).build()
             )
         }
+        binding.rowTheme.setOnClickListener {
+            viewModel.featureFuture()
+        }
+        binding.rowNotice.setOnClickListener {
+            viewModel.featureFuture()
+        }
+        binding.rowPremium.setOnClickListener {
+            viewModel.featureFuture()
+        }
+        binding.rowOurApp.setOnClickListener {
+            viewModel.featureFuture()
+        }
+        binding.rowPolicy.setOnClickListener {
+            viewModel.featureFuture()
+        }
+        binding.rowHelp.setOnClickListener {
+            viewModel.featureFuture()
+        }
     }
 
     private fun observeState() {

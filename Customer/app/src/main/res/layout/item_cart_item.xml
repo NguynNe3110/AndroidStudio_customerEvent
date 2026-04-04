@@ -125,17 +125,5 @@
                     android:textColor="#E53935"/>
             </LinearLayout>
         </LinearLayout>
-
-        <!-- Nút xóa riêng lẻ -->
-        <ImageButton
-            android:id="@+id/btn_delete"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="8dp"
-            android:src="@android:drawable/ic_menu_delete"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Xóa"
-            android:tint="@color/event_ongoing"/>
-
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -60,7 +60,6 @@ class CartFragment : Fragment() {
                 // Nếu user tick thủ công → cập nhật state
                 viewModel.toggleItemSelection(itemId)
             },
-            onDelete = { itemId -> viewModel.deleteItem(itemId) },
             onQuantityChange = { itemId, qty -> viewModel.updateItemQuantity(itemId, qty) }
         )
         binding.recyclerCart.apply {

@@ -70,7 +70,6 @@ class CartViewModel(
     // ── Update quantity ───────────────────────────────────────────────────────
     fun updateItemQuantity(itemId: Long, quantity: Int) {
         if (quantity <= 0) {
-            deleteItem(itemId)
             return
         }
         viewModelScope.launch {
@@ -82,31 +81,6 @@ class CartViewModel(
                     }
                 }
                 is ApiResult.Error -> _cartEvent.emit(CartUiEvent.Toast(r.message))
-            }
-        }
-    }
-
-    // ── Delete single item ────────────────────────────────────────────────────
-    fun deleteItem(itemId: Long) {
-        viewModelScope.launch {
-            _cartState.update { it.copy(isLoading = true) }
-            when (val r = cartRepo.deleteCartItem(itemId)) {
-                is ApiResult.Success -> {
-                    val cart = r.data
-                    _cartState.update {
-                        it.copy(
-                            isLoading = false,
-                            items = cart.items,
-                            totalAmount = cart.totalAmount,
-                            selectedItemIds = it.selectedItemIds - itemId
-                        )
-                    }
-                    _cartEvent.emit(CartUiEvent.ItemDeleted)
-                }
-                is ApiResult.Error -> {
-                    _cartState.update { it.copy(isLoading = false) }
-                    _cartEvent.emit(CartUiEvent.Toast(r.message))
-                }
             }
         }
     }

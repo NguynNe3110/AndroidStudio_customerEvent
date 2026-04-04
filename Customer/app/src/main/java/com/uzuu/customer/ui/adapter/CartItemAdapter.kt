@@ -12,7 +12,6 @@ import java.util.Locale
 
 class CartItemAdapter(
     private val onCheckedChange: (itemId: Long, checked: Boolean) -> Unit,
-    private val onDelete: (itemId: Long) -> Unit,
     private val onQuantityChange: (itemId: Long, newQty: Int) -> Unit
 ) : ListAdapter<CartItem, CartItemAdapter.VH>(DIFF) {
 
@@ -55,9 +54,6 @@ class CartItemAdapter(
             checkboxSelect.setOnCheckedChangeListener { _, checked ->
                 onCheckedChange(item.id, checked)
             }
-
-            // Nút xóa riêng lẻ
-            btnDelete.setOnClickListener { onDelete(item.id) }
 
             // Tăng / giảm số lượng
             btnMinus.setOnClickListener {

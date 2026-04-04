@@ -157,6 +157,7 @@
                     android:background="@color/blue_border_1"/>
 
                 <LinearLayout
+                    android:id="@+id/row_theme"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:orientation="horizontal"
@@ -172,10 +173,13 @@
                         android:textColor="@color/blue_text_secondary"/>
                 </LinearLayout>
 
+
+
                 <View android:layout_width="match_parent" android:layout_height="1dp"
                     android:background="@color/blue_border_1"/>
 
                 <LinearLayout
+                    android:id="@+id/row_notice"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:orientation="horizontal"
@@ -195,6 +199,67 @@
                     android:background="@color/blue_border_1"/>
 
                 <LinearLayout
+                    android:id="@+id/row_premium"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Chặn quảng cáo"
+                        android:textSize="15sp"
+                        android:textColor="@color/blue_text_secondary"/>
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/blue_border_1"/>
+
+                <LinearLayout
+                    android:id="@+id/row_ourApp"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Ứng dụng của chúng tôi"
+                        android:textSize="15sp"
+                        android:textColor="@color/blue_text_secondary"/>
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/blue_border_1"/>
+
+                <LinearLayout
+                    android:id="@+id/row_policy"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Chính sách &amp; điều khoản"
+                        android:textSize="15sp"
+                        android:textColor="@color/blue_text_secondary"/>
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/blue_border_1"/>
+
+                <LinearLayout
+                    android:id="@+id/row_help"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:orientation="horizontal"
@@ -209,7 +274,6 @@
                         android:textSize="15sp"
                         android:textColor="@color/blue_text_secondary"/>
                 </LinearLayout>
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

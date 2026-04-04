@@ -63,7 +63,7 @@ class HomeFragment : Fragment() {
     // Sync avatar mỗi khi quay lại tab Home (user có thể vừa đổi ảnh ở Personal)
     override fun onResume() {
         super.onResume()
-        viewModel.startPolling(30_000L)  // 30 giây/lần
+        viewModel.startPolling(15_000L)  // 15 giây/lần
         val uri = SessionManager.getAvatarUri()
         if (!uri.isNullOrBlank()) {
             Glide.with(this)

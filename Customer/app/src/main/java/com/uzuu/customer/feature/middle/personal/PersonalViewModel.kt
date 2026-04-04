@@ -102,4 +102,10 @@ class PersonalViewModel(
             }
         }
     }
+
+    fun featureFuture() {
+        viewModelScope.launch {
+            _event.emit(PersonalUiEvent.Toast("Tính năng đang được phát triển!"))
+        }
+    }
 }
