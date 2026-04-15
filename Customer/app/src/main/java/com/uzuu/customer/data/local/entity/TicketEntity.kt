@@ -1,12 +1,17 @@
 package com.uzuu.customer.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Entity
-data class TicketEntity (
-    val id: Int,
-    val idEvent: Int,
-    val idCategoryTicket: Int,
-    val state: String,
-    val price: Int,
+@Entity(tableName = "tickets")
+data class TicketEntity(
+    @PrimaryKey
+    val id: Long,
+    val eventId: Long,
+    val categoryTicketId: Long,
+    val name: String,
+    val price: Double,
+    val totalQuantity: Int,
+    val remainingQuantity: Int,
+    val lastUpdated: Long = System.currentTimeMillis()
 )

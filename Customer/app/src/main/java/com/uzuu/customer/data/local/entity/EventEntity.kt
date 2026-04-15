@@ -1,18 +1,21 @@
 package com.uzuu.customer.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "events")
 data class EventEntity(
-    val id: Int,
-    val title: String,
-    val categoryEvent: String,
-    val description: String,
-    val dateStartSellTicket: Long,
-    val dateEndSellTicket: Long,
-    val dateStart: Long,
-    val dateEnd: Long,
-    val status: String,
+    @PrimaryKey
+    val id: Long,
+    val name: String,
+    val categoryName: String,
     val location: String,
-    val img: String
+    val startTime: String?,
+    val endTime: String?,
+    val saleStartDate: String?,
+    val saleEndDate: String?,
+    val description: String?,
+    val status: String,
+    val imageUrls: String, // Store as JSON string
+    val lastUpdated: Long = System.currentTimeMillis()
 )

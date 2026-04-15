@@ -1,0 +1,49 @@
+```
+# Compiled and build artifacts
+*.class
+*.dex
+*.so
+*.aar
+*.apk
+*.jar
+
+# Dependencies
+.gradle/
+build/
+app/build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Android Studio generated files
+*.iml
+*.iws
+.idea/
+
+# Generated files
+gen/
+out/
+
+# Log Files
+*.log
+
+# Keystore
+*.keystore
+*.jks
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Coverage reports
+coverage/
+*.gcov
+*.lcov
+*.profdata
+
+# Temporary files
+*.tmp
+*.temp
+*~
+```
