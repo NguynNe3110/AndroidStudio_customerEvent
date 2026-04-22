@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "246745532367",
+    "project_id": "fir-db-e673f",
+    "storage_bucket": "fir-db-e673f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246745532367:android:ef80bedaa9c5c961fa34ba",
+        "android_client_info": {
+          "package_name": "com.uzuu.learn30_firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvMToTctEldL09hnY_-mpJe6MfDIBxNnQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
